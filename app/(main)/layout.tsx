@@ -7,16 +7,14 @@ interface AppLayoutProps {
 }
 
 export const metadata: Metadata = {
-  title: "PrimeReact Sakai",
-  description:
-    "The ultimate collection of design-agnostic, flexible and accessible React UI Components.",
+  title: "GA SOLUÇÕES - Controle de Documentos",
+  description: "Controle de validade de documentos para clientes",
   robots: { index: false, follow: false },
   openGraph: {
     type: "website",
-    title: "PrimeReact SAKAI-REACT",
+    title: "GA SOLUÇÕES - Controle de Documentos",
     url: "https://sakai.primereact.org/",
-    description:
-      "The ultimate collection of design-agnostic, flexible and accessible React UI Components.",
+    description: "Controle de validade de documentos para clientes",
     images: ["https://www.primefaces.org/static/social/sakai-react.png"],
     ttl: 604800,
   },
