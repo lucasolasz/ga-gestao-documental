@@ -5,6 +5,7 @@ import Link from "next/link";
 import { classNames } from "primereact/utils";
 import { forwardRef, useContext, useImperativeHandle, useRef } from "react";
 import { LayoutContext } from "./context/layoutcontext";
+import Image from "next/image";
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
   const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } =
@@ -22,13 +23,17 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
   return (
     <div className="layout-topbar">
       <Link href="/" className="layout-topbar-logo">
-        <img
-          src={`/layout/images/logo-${layoutConfig.colorScheme !== "light" ? "white" : "dark"}.svg`}
-          width="47.22px"
-          height={"35px"}
-          alt="logo"
+        <Image
+          src="/assets/image_login.jpg"
+          alt="Logo"
+          width={35}
+          height={35}
+          priority
+          className="mr-2"
         />
-        <span>SAKAI</span>
+        <span className="text-xl font-small ml-2">
+          GA Soluções Empresariais
+        </span>
       </Link>
 
       <button

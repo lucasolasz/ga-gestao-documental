@@ -1,18 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useContext } from 'react';
-import { LayoutContext } from './context/layoutcontext';
+import Image from "next/image";
 
 const AppFooter = () => {
-    const { layoutConfig } = useContext(LayoutContext);
-
-    return (
-        <div className="layout-footer">
-            <img src={`/layout/images/logo-${layoutConfig.colorScheme === 'light' ? 'dark' : 'white'}.svg`} alt="Logo" height="20" className="mr-2" />
-            by
-            <span className="font-medium ml-2">PrimeReact</span>
-        </div>
-    );
+  return (
+    <div className="layout-footer">
+      <Image
+        src="/assets/image_login.jpg"
+        alt="Logo"
+        width={20}
+        height={20}
+        priority
+        className="mr-2"
+      />
+      <span className="font-medium ml-2">GA Soluções Empresariais</span>
+    </div>
+  );
 };
 
 export default AppFooter;
