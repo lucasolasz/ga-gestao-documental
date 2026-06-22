@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { pesquisarPecas } from "@/services/peca-service";
 import ClientTabelaPecas from "./_components/tabelaPecas";
 import { Peca } from "@/types/peca";
+import Loading from "./loading";
 
 export default function TabelasPage() {
   const [pecas, setPecas] = useState<Peca[]>([]);
@@ -16,9 +17,9 @@ export default function TabelasPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return <div className="p-4">Carregando...</div>;
-  }
-
-  return <ClientTabelaPecas pecas={pecas} titulo="Peças" />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <ClientTabelaPecas pecas={pecas} titulo="Peças" />
+    </Suspense>
+  );
 }
