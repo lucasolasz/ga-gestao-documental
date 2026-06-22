@@ -31,5 +31,9 @@ export const viewport: Viewport = {
 };
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  return <Layout>{children}</Layout>;
+  return (
+    <Suspense fallback={null}>
+      <Layout>{children}</Layout>
+    </Suspense>
+  );
 }
