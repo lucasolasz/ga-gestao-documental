@@ -21,6 +21,7 @@ export default function TabelaDashboard({
       <Column field="tipo.descricao" header="Tipo Documento" sortable />
       <Column
         header="Data Validade"
+        field="data_validade"
         sortable
         body={(documento: Documento) => formatDate(documento.data_validade)}
       />
