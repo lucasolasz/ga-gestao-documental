@@ -1,15 +1,19 @@
-import { DocumentStatus, StatusSeverity, StatusType } from '@/types/document-status';
+import {
+  DocumentStatus,
+  StatusSeverity,
+  StatusType,
+} from "@/types/documento-status";
 
 export function calculateDocumentStatus(
-  dataValidade: string | null | undefined
+  dataValidade: string | null | undefined,
 ): DocumentStatus {
   if (!dataValidade) {
     return {
       diasParaVencer: null,
-      status: 'no_expiry',
-      statusLabel: 'Sem validade',
-      severity: 'secondary',
-      iconClass: 'pi-infinity',
+      status: "no_expiry",
+      statusLabel: "Sem validade",
+      severity: "secondary",
+      iconClass: "pi-infinity",
     };
   }
 
@@ -27,30 +31,30 @@ export function calculateDocumentStatus(
   let iconClass: string;
 
   if (diasParaVencer < 0) {
-    status = 'expired';
+    status = "expired";
     statusLabel = `Vencido há ${Math.abs(diasParaVencer)} dias`;
-    severity = 'danger';
-    iconClass = 'pi-times-circle';
+    severity = "danger";
+    iconClass = "pi-times-circle";
   } else if (diasParaVencer === 0) {
-    status = 'critical';
-    statusLabel = 'Vence hoje';
-    severity = 'warning';
-    iconClass = 'pi-exclamation-triangle';
+    status = "critical";
+    statusLabel = "Vence hoje";
+    severity = "warning";
+    iconClass = "pi-exclamation-triangle";
   } else if (diasParaVencer <= 30) {
-    status = 'critical';
+    status = "critical";
     statusLabel = `Vence em ${diasParaVencer} dias`;
-    severity = 'warning';
-    iconClass = 'pi-exclamation-triangle';
+    severity = "warning";
+    iconClass = "pi-exclamation-triangle";
   } else if (diasParaVencer <= 90) {
-    status = 'warning';
+    status = "warning";
     statusLabel = `Vence em ${diasParaVencer} dias`;
-    severity = 'info';
-    iconClass = 'pi-clock';
+    severity = "info";
+    iconClass = "pi-clock";
   } else {
-    status = 'ok';
+    status = "ok";
     statusLabel = `Válido por ${diasParaVencer} dias`;
-    severity = 'success';
-    iconClass = 'pi-check-circle';
+    severity = "success";
+    iconClass = "pi-check-circle";
   }
 
   return { diasParaVencer, status, statusLabel, severity, iconClass };
@@ -58,15 +62,15 @@ export function calculateDocumentStatus(
 
 export function getSeverity(status: StatusType): StatusSeverity {
   switch (status) {
-    case 'expired':
-      return 'danger';
-    case 'critical':
-      return 'warning';
-    case 'warning':
-      return 'info';
-    case 'ok':
-      return 'success';
-    case 'no_expiry':
-      return 'secondary';
+    case "expired":
+      return "danger";
+    case "critical":
+      return "warning";
+    case "warning":
+      return "info";
+    case "ok":
+      return "success";
+    case "no_expiry":
+      return "secondary";
   }
 }

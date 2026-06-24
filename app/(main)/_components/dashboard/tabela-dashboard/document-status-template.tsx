@@ -1,4 +1,4 @@
-import { Documento } from "@/types/document";
+import { Documento } from "@/types/entidades-banco/documento";
 import { Tag } from "primereact/tag";
 
 export function statusBodyTemplate(documento: Documento): React.ReactNode {

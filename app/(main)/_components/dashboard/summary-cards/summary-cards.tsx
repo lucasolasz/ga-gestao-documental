@@ -1,6 +1,6 @@
 "use client";
 
-import { StatusType } from "@/types/document-status";
+import { StatusType } from "@/types/entidades-banco/documento-status";
 
 interface Summary {
   expired: number;

@@ -1,4 +1,4 @@
-import { Documento } from "@/types/document";
+import { Documento } from "@/types/documento";
 import { calculateDocumentStatus } from "@/utils/document-status";
 
 type DocumentPayload = {
