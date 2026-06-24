@@ -7,62 +7,84 @@ import {
   forwardRef,
   useImperativeHandle,
   useRef,
+  CSSProperties,
 } from "react";
 import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 
-function flattenToString(obj: any): string {
-  if (obj === null || obj === undefined) return "";
-  if (typeof obj !== "object") return String(obj);
-  return Object.values(obj).map(flattenToString).join(" ");
+export interface ColumnDef<T> {
+  field?: string;
+  header?: string;
+  sortable?: boolean;
+  body?: (row: T) => ReactNode;
+  filterValue?: (row: T) => string;
+  exportable?: boolean;
+  style?: CSSProperties;
+  selectionMode?: "single" | "multiple";
 }
 
 interface TabelaGenericaProps<T> {
   value: T[];
   titulo: string;
-  children: ReactNode;
+  columns: ColumnDef<T>[];
   toolbarEsquerda?: ReactNode;
   toolbarDireita?: ReactNode;
   selection?: any;
   onSelectionChange?: (e: any) => void;
   headerActions?: ReactNode;
-  getFilterString?: (row: T) => string;
 }
 
-// Usamos forwardRef para permitir que o componente pai acione o exportCSV(), igual ao Sakai
+function getNestedValue(obj: any, path: string): any {
+  return path.split(".").reduce((acc, key) => acc?.[key], obj);
+}
+
 const TabelaGenerica = forwardRef(
   <T extends Record<string, any>>(
     {
       value,
       titulo,
-      children,
+      columns,
       toolbarEsquerda,
       toolbarDireita,
       selection,
       onSelectionChange,
       headerActions,
-      getFilterString,
     }: TabelaGenericaProps<T>,
     ref: any,
   ) => {
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const dtRef = useRef<DataTable<any>>(null);
 
-    const filteredValue = useMemo(() => {
-      const search = globalFilterValue.trim().toLowerCase();
-      if (!search) return value;
-      const stringify = getFilterString ?? flattenToString;
-      return value.filter((row) =>
-        stringify(row).toLowerCase().includes(search),
-      );
-    }, [value, globalFilterValue, getFilterString]);
-
-    // Expõe os métodos internos do DataTable (como exportCSV) para quem chamar a TabelaGenerica
     useImperativeHandle(ref, () => ({
       exportCSV: () => dtRef.current?.exportCSV(),
     }));
+
+    const filteredValue = useMemo(() => {
+      const search = globalFilterValue.trim().toLowerCase();
+      if (!search) return value;
+
+      return value.filter((row) => {
+        const parts: string[] = [];
+        for (const col of columns) {
+          if (col.filterValue) {
+            parts.push(col.filterValue(row));
+          } else if (col.body) {
+            const result = col.body(row);
+            if (typeof result === "string" || typeof result === "number") {
+              parts.push(String(result));
+            }
+            // JSX result (e.g. action buttons): ignored in filter
+          } else if (col.field) {
+            const val = getNestedValue(row, col.field);
+            if (val != null) parts.push(String(val));
+          }
+        }
+        return parts.join(" ").toLowerCase().includes(search);
+      });
+    }, [value, globalFilterValue, columns]);
 
     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setGlobalFilterValue(e.target.value.replace(",", "."));
@@ -87,7 +109,6 @@ const TabelaGenerica = forwardRef(
 
     return (
       <div className="card p-4">
-        {/* Barra de Ferramentas Condicional igual ao Sakai */}
         {(toolbarEsquerda || toolbarDireita) && (
           <div className="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
             <div>{toolbarEsquerda}</div>
@@ -112,7 +133,18 @@ const TabelaGenerica = forwardRef(
           responsiveLayout="scroll"
           emptyMessage="Nenhum registro encontrado."
         >
-          {children}
+          {columns.map((col, i) => (
+            <Column
+              key={col.field ?? col.header ?? i}
+              field={col.field}
+              header={col.header}
+              sortable={col.sortable}
+              body={col.body}
+              exportable={col.exportable}
+              style={col.style}
+              selectionMode={col.selectionMode}
+            />
+          ))}
         </DataTable>
       </div>
     );
@@ -120,4 +152,7 @@ const TabelaGenerica = forwardRef(
 );
 
 TabelaGenerica.displayName = "TabelaGenerica";
-export default TabelaGenerica;
+
+export default TabelaGenerica as <T extends Record<string, any>>(
+  props: TabelaGenericaProps<T> & { ref?: React.Ref<{ exportCSV: () => void }> },
+) => React.ReactElement;

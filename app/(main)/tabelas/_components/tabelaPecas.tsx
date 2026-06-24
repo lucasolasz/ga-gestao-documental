@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
@@ -226,28 +225,29 @@ export default function ClientTabelaPecas({
             onClick={abrirNovo}
           />
         }
-      >
-        <Column field="codigo" header="Código" sortable />
-        <Column field="descricao" header="Descrição" sortable />
-        <Column field="marca" header="Marca" sortable />
-        <Column field="estoque" header="Estoque" sortable />
-        <Column
-          header="Preço custo"
-          sortable
-          body={(row: Peca) => formatCurrency(row.preco_custo)}
-        />
-        <Column
-          header="Preço venda"
-          sortable
-          body={(row: Peca) => formatCurrency(row.preco_venda)}
-        />
-        <Column
-          header="Ações"
-          body={colunaAcoesTemplate}
-          exportable={false}
-          style={{ minWidth: "12rem" }}
-        ></Column>
-      </TabelaGenerica>
+        columns={[
+          { field: "codigo", header: "Código", sortable: true },
+          { field: "descricao", header: "Descrição", sortable: true },
+          { field: "marca", header: "Marca", sortable: true },
+          { field: "estoque", header: "Estoque", sortable: true },
+          {
+            header: "Preço custo",
+            sortable: true,
+            body: (row: Peca) => formatCurrency(row.preco_custo),
+          },
+          {
+            header: "Preço venda",
+            sortable: true,
+            body: (row: Peca) => formatCurrency(row.preco_venda),
+          },
+          {
+            header: "Ações",
+            body: colunaAcoesTemplate,
+            exportable: false,
+            style: { minWidth: "12rem" },
+          },
+        ]}
+      />
 
       <Dialog
         visible={dialogPeca}
