@@ -51,28 +51,10 @@ export default function ClientTabelaPecas({
     toast,
     abrirNovo,
     fechar,
-    editar,
-    confirmarDeletar,
+    colunaAcoes,
     salvar,
     deletar,
   } = useCrud<Peca>(pecaVazia);
-
-  const colunaAcoesTemplate = (rowData: Peca) => (
-    <div className="flex gap-2">
-      <Button
-        icon="pi pi-pencil"
-        rounded
-        severity="success"
-        onClick={() => editar(rowData)}
-      />
-      <Button
-        icon="pi pi-trash"
-        rounded
-        severity="warning"
-        onClick={() => confirmarDeletar(rowData)}
-      />
-    </div>
-  );
 
   return (
     <>
@@ -106,7 +88,7 @@ export default function ClientTabelaPecas({
           },
           {
             header: "Ações",
-            body: colunaAcoesTemplate,
+            body: colunaAcoes,
             exportable: false,
             style: { minWidth: "12rem" },
           },

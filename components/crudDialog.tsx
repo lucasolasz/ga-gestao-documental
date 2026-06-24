@@ -10,6 +10,7 @@ interface CrudDialogProps {
   onHide: () => void;
   onSalvar: () => void;
   salvando: boolean;
+  largura?: string;
   children: ReactNode;
 }
 
@@ -19,6 +20,7 @@ export default function CrudDialog({
   onHide,
   onSalvar,
   salvando,
+  largura,
   children,
 }: CrudDialogProps) {
   const footer = (
@@ -43,7 +45,7 @@ export default function CrudDialog({
   return (
     <Dialog
       visible={visible}
-      style={{ width: "450px" }}
+      style={{ width: largura ?? "450px" }}
       header={titulo}
       modal
       className="p-fluid"

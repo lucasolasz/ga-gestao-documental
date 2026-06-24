@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, DefaultValues } from "react-hook-form";
+import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
 interface SalvarParams<T extends { id: number | string }> {
@@ -54,6 +55,23 @@ export function useCrud<T extends { id: number | string }>(itemVazio: T) {
     setItemSelecionado(i);
     setDialogDeletar(true);
   };
+
+  const colunaAcoes = (rowData: T) => (
+    <div className="flex gap-2">
+      <Button
+        icon="pi pi-pencil"
+        rounded
+        severity="success"
+        onClick={() => editar(rowData)}
+      />
+      <Button
+        icon="pi pi-trash"
+        rounded
+        severity="warning"
+        onClick={() => confirmarDeletar(rowData)}
+      />
+    </div>
+  );
 
   const salvar = async (
     data: T,
@@ -140,6 +158,7 @@ export function useCrud<T extends { id: number | string }>(itemVazio: T) {
     fechar,
     editar,
     confirmarDeletar,
+    colunaAcoes,
     salvar,
     deletar,
   };
