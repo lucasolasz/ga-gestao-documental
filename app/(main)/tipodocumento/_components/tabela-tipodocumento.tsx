@@ -12,13 +12,13 @@ import ConfirmarExclusaoDialog from "../../../../components/confirmarExclusaoDia
 import { useCrud } from "../../../../hooks/useCrud";
 import { TipoDocumento } from "@/types/entidades-banco/tipoDocumento";
 import {
+  pesquisarTiposDocumentos,
   criarTipoDocumento,
   atualizarTipoDocumento,
   deletarTipoDocumento as deletarTipoDocumentoService,
 } from "@/services/tipodocumento-service";
 
 interface TabelaTipoDocumentoProps {
-  tiposDocumentos: TipoDocumento[];
   titulo: string;
 }
 
@@ -28,10 +28,10 @@ const tipoDocumentoVazio: TipoDocumento = {
 };
 
 export default function TabelaTipoDocumento({
-  tiposDocumentos,
   titulo,
 }: TabelaTipoDocumentoProps) {
   const {
+    items: tiposDocumentos,
     control,
     handleSubmit,
     errors,
@@ -47,7 +47,7 @@ export default function TabelaTipoDocumento({
     colunaAcoes,
     salvar,
     deletar,
-  } = useCrud<TipoDocumento>(tipoDocumentoVazio);
+  } = useCrud<TipoDocumento>(tipoDocumentoVazio, pesquisarTiposDocumentos);
 
   return (
     <>

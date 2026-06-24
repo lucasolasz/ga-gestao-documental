@@ -14,13 +14,13 @@ import { useCrud } from "../../../../hooks/useCrud";
 import { formatCurrency } from "@/utils/numberUtil";
 import { Peca } from "@/types/peca";
 import {
+  pesquisarPecas,
   criarPeca,
   atualizarPeca,
   deletarPeca as deletarPecaService,
 } from "@/services/peca-service";
 
 interface ClientTabelaPecasProps {
-  pecas: Peca[];
   titulo: string;
 }
 
@@ -34,11 +34,9 @@ const pecaVazia: Peca = {
   preco_venda: 0,
 };
 
-export default function ClientTabelaPecas({
-  pecas,
-  titulo,
-}: ClientTabelaPecasProps) {
+export default function ClientTabelaPecas({ titulo }: ClientTabelaPecasProps) {
   const {
+    items: pecas,
     control,
     handleSubmit,
     errors,
@@ -54,7 +52,7 @@ export default function ClientTabelaPecas({
     colunaAcoes,
     salvar,
     deletar,
-  } = useCrud<Peca>(pecaVazia);
+  } = useCrud<Peca>(pecaVazia, pesquisarPecas);
 
   return (
     <>

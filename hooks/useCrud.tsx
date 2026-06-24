@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, DefaultValues } from "react-hook-form";
 import { Button } from "primereact/button";
@@ -17,9 +17,22 @@ interface DeletarParams<T extends { id: number | string }> {
   mensagem?: string;
 }
 
-export function useCrud<T extends { id: number | string }>(itemVazio: T) {
+export function useCrud<T extends { id: number | string }>(
+  itemVazio: T,
+  fetchFn?: () => Promise<T[]>,
+) {
   const router = useRouter();
   const toast = useRef<Toast>(null);
+
+  const [items, setItems] = useState<T[]>([]);
+
+  const buscar = useCallback(() => {
+    fetchFn?.().then(setItems).catch(console.error);
+  }, [fetchFn]);
+
+  useEffect(() => {
+    buscar();
+  }, [buscar]);
 
   const {
     control,
@@ -98,6 +111,7 @@ export function useCrud<T extends { id: number | string }>(itemVazio: T) {
       });
 
       fechar();
+      buscar();
       router.refresh();
     } catch (err) {
       toast.current?.show({
@@ -130,6 +144,7 @@ export function useCrud<T extends { id: number | string }>(itemVazio: T) {
 
       setDialogDeletar(false);
       setItemSelecionado(itemVazio);
+      buscar();
       router.refresh();
     } catch (err) {
       toast.current?.show({
@@ -144,6 +159,7 @@ export function useCrud<T extends { id: number | string }>(itemVazio: T) {
   };
 
   return {
+    items,
     control,
     handleSubmit,
     errors,
