@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { AppMenuItem } from "@/types";
 import Link from "next/link";
 import AppMenuitem from "./AppMenuitem";
 import { MenuProvider } from "./context/menucontext";
+import { AppMenuItem } from "@/types/layout";
 
 const AppMenu = () => {
   const model: AppMenuItem[] = [
@@ -26,8 +26,8 @@ const AppMenu = () => {
         },
         {
           label: "Tipos de Documentos",
-          icon: "pi pi-fw pi-bookmark",
-          to: "/uikit/floatlabel",
+          icon: "pi pi-fw pi-file",
+          to: "/tipodocumento",
         },
       ],
     },
