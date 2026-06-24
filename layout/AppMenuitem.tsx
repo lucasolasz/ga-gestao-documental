@@ -1,5 +1,5 @@
 "use client";
-import { AppMenuItemProps } from "@/types";
+
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Ripple } from "primereact/ripple";
@@ -7,6 +7,7 @@ import { classNames } from "primereact/utils";
 import React, { useContext, useEffect } from "react";
 import { CSSTransition } from "react-transition-group";
 import { MenuContext } from "./context/menucontext";
+import { AppMenuItemProps } from "@/types/layout";
 
 const AppMenuitem = (props: AppMenuItemProps) => {
   const pathname = usePathname();
