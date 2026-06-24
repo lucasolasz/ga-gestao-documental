@@ -45,7 +45,7 @@ export default function CrudDialog({
   return (
     <Dialog
       visible={visible}
-      style={{ width: largura ?? "450px" }}
+      style={{ width: largura ?? "50%" }}
       header={titulo}
       modal
       className="p-fluid"
