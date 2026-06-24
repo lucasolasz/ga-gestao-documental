@@ -12,8 +12,10 @@ import { classNames } from "primereact/utils";
 import TabelaGenerica from "../../../../components/tabelaGenerica";
 import CrudDialog from "../../../../components/crudDialog";
 import ConfirmarExclusaoDialog from "../../../../components/confirmarExclusaoDialog";
+import DialogDocumentosCliente from "./dialog-documentos-cliente";
 import { useCrud } from "../../../../hooks/useCrud";
 import { Categoria } from "@/types/entidades-banco/categoria";
+import { Client } from "@/types/entidades-banco/client";
 import { pesquisarCategorias } from "@/services/categoria-service";
 import {
   ClienteForm,
@@ -37,6 +39,9 @@ const clienteVazio: ClienteForm = {
 
 export default function TabelaClientes({ titulo }: TabelaClientesProps) {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [clienteParaDocumentos, setClienteParaDocumentos] =
+    useState<Client | null>(null);
+  const [dialogDocumentosVisivel, setDialogDocumentosVisivel] = useState(false);
 
   useEffect(() => {
     pesquisarCategorias().then(setCategorias).catch(console.error);
@@ -59,7 +64,20 @@ export default function TabelaClientes({ titulo }: TabelaClientesProps) {
     colunaAcoes,
     salvar,
     deletar,
-  } = useCrud<ClienteForm>(clienteVazio, pesquisarClientes);
+  } = useCrud<ClienteForm>(clienteVazio, pesquisarClientes, {
+    acoesExtras: (row) => (
+      <Button
+        icon="pi pi-folder-open"
+        rounded
+        severity="info"
+        tooltip="Documentos"
+        onClick={() => {
+          setClienteParaDocumentos(row as unknown as Client);
+          setDialogDocumentosVisivel(true);
+        }}
+      />
+    ),
+  });
 
   return (
     <>
@@ -218,6 +236,16 @@ export default function TabelaClientes({ titulo }: TabelaClientesProps) {
           </span>
         }
       />
+
+      {clienteParaDocumentos && (
+        <DialogDocumentosCliente
+          key={clienteParaDocumentos.id}
+          clienteId={clienteParaDocumentos.id}
+          nomeCliente={clienteParaDocumentos.nome}
+          visible={dialogDocumentosVisivel}
+          onHide={() => setDialogDocumentosVisivel(false)}
+        />
+      )}
     </>
   );
 }
