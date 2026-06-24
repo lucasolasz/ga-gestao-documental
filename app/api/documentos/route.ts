@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
   query = query.not("data_validade", "is", null);
 
   const { data, error, count } = await query
-    .order("data_validade", { ascending: false })
+    .order("data_validade")
     .range(from, to);
 
   if (error) {
