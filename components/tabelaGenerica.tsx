@@ -2,26 +2,33 @@
 
 import {
   useState,
+  useMemo,
   ReactNode,
   forwardRef,
   useImperativeHandle,
   useRef,
 } from "react";
-import { FilterMatchMode } from "primereact/api";
-import { DataTable, DataTableFilterMeta } from "primereact/datatable";
+import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
+
+function flattenToString(obj: any): string {
+  if (obj === null || obj === undefined) return "";
+  if (typeof obj !== "object") return String(obj);
+  return Object.values(obj).map(flattenToString).join(" ");
+}
 
 interface TabelaGenericaProps<T> {
   value: T[];
   titulo: string;
   children: ReactNode;
-  toolbarEsquerda?: ReactNode; // Para os botões Novo/Deletar do CRUD
-  toolbarDireita?: ReactNode; // Para os botões Importar/Exportar
-  selection?: any; // Para seleção múltipla de linhas
+  toolbarEsquerda?: ReactNode;
+  toolbarDireita?: ReactNode;
+  selection?: any;
   onSelectionChange?: (e: any) => void;
-  headerActions?: ReactNode; // Botões ao lado da busca geral
+  headerActions?: ReactNode;
+  getFilterString?: (row: T) => string;
 }
 
 // Usamos forwardRef para permitir que o componente pai acione o exportCSV(), igual ao Sakai
@@ -36,14 +43,21 @@ const TabelaGenerica = forwardRef(
       selection,
       onSelectionChange,
       headerActions,
+      getFilterString,
     }: TabelaGenericaProps<T>,
     ref: any,
   ) => {
-    const [filters, setFilters] = useState<DataTableFilterMeta>({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const dtRef = useRef<DataTable<any>>(null);
+
+    const filteredValue = useMemo(() => {
+      const search = globalFilterValue.trim().toLowerCase();
+      if (!search) return value;
+      const stringify = getFilterString ?? flattenToString;
+      return value.filter((row) =>
+        stringify(row).toLowerCase().includes(search),
+      );
+    }, [value, globalFilterValue, getFilterString]);
 
     // Expõe os métodos internos do DataTable (como exportCSV) para quem chamar a TabelaGenerica
     useImperativeHandle(ref, () => ({
@@ -51,12 +65,7 @@ const TabelaGenerica = forwardRef(
     }));
 
     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const inputValue = e.target.value.replace(",", ".");
-      let _filters = { ...filters };
-      // @ts-ignore
-      _filters["global"].value = inputValue;
-      setFilters(_filters);
-      setGlobalFilterValue(inputValue);
+      setGlobalFilterValue(e.target.value.replace(",", "."));
     };
 
     const header = (
@@ -88,11 +97,10 @@ const TabelaGenerica = forwardRef(
 
         <DataTable
           ref={dtRef}
-          value={value}
+          value={filteredValue}
           paginator
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
-          filters={filters}
           header={header}
           dataKey="id"
           selection={selection}
