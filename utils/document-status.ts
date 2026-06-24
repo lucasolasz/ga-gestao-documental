@@ -2,7 +2,7 @@ import {
   DocumentStatus,
   StatusSeverity,
   StatusType,
-} from "@/types/documento-status";
+} from "@/types/entidades-banco/documento-status";
 
 export function calculateDocumentStatus(
   dataValidade: string | null | undefined,

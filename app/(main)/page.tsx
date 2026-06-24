@@ -1,12 +1,12 @@
 "use client";
 
 import { pesquisarDocumentos } from "@/services/documento-service";
-import { Documento } from "@/types/documento";
-import { StatusType } from "@/types/documento-status";
 
 import { useEffect, useMemo, useState } from "react";
 import TabelaDashboard from "./_components/dashboard/tabela-dashboard/tabela-dashboard";
 import SummaryCards from "./_components/dashboard/summary-cards/summary-cards";
+import { Documento } from "@/types/entidades-banco/documento";
+import { StatusType } from "@/types/entidades-banco/documento-status";
 
 const Dashboard = () => {
   const [documentos, setDocumentos] = useState<Documento[]>([]);
