@@ -111,6 +111,10 @@ const TabelaGenerica = forwardRef(
       </div>
     );
 
+    const footer = globalFilterValue.trim()
+      ? `Exibindo ${filteredValue.length} de ${value.length} registro(s)`
+      : `Total: ${value.length} registro(s)`;
+
     return (
       <div className="card p-4">
         {(toolbarEsquerda || toolbarDireita) && (
@@ -127,6 +131,7 @@ const TabelaGenerica = forwardRef(
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
           header={header}
+          footer={footer}
           dataKey="id"
           selection={selection}
           onSelectionChange={onSelectionChange}
