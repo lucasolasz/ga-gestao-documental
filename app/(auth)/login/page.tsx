@@ -1,8 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import Image from "next/image";
+import { useState } from "react";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
+import { Message } from "primereact/message";
 import { Password } from "primereact/password";
 import { Controller, useForm } from "react-hook-form";
 import { login } from "./auth/actions";
@@ -13,6 +15,7 @@ interface FormValues {
 }
 
 const LoginPage = () => {
+  const [loginError, setLoginError] = useState("");
   const {
     control,
     handleSubmit,
@@ -25,10 +28,14 @@ const LoginPage = () => {
   });
 
   const onSubmit = async (data: FormValues) => {
+    setLoginError("");
     const formData = new FormData();
     formData.append("email", data.email);
     formData.append("password", data.password);
-    await login({ success: false, message: "" }, formData);
+    const result = await login({ success: false, message: "" }, formData);
+    if (result && !result.success) {
+      setLoginError("Email ou senha incorretos.");
+    }
   };
 
   return (
@@ -124,6 +131,9 @@ const LoginPage = () => {
             )}
           />
 
+          {loginError && (
+            <Message severity="error" text={loginError} className="w-full" />
+          )}
           <Button label="Entrar" className="w-full p-3 text-xl" type="submit" />
         </form>
       </div>
