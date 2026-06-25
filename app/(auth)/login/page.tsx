@@ -40,7 +40,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden filled">
-      <div className="flex flex-column align-items-center justify-content-center p-5 gap-3 card">
+      <div className="flex flex-column align-items-center justify-content-center p-5 gap-3 card w-11 md:w-auto">
         <div className="text-center">
           <Image
             src="/assets/image_login.jpg"
@@ -57,7 +57,7 @@ const LoginPage = () => {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-column gap-2 w-full"
+          className="flex flex-column gap-2 w-full p-fluid"
         >
           <label
             htmlFor="email"
