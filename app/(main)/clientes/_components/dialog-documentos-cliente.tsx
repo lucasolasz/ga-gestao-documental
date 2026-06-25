@@ -8,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { FileUpload, FileUploadSelectEvent } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
+import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
 
@@ -53,8 +54,7 @@ const documentoVazio: DocumentoForm = {
 
 const toISODate = (d: Date) => d.toLocaleDateString("sv");
 
-const toDate = (iso?: string) =>
-  iso ? new Date(iso + "T00:00:00") : null;
+const toDate = (iso?: string) => (iso ? new Date(iso + "T00:00:00") : null);
 
 export default function DialogDocumentosCliente({
   clienteId,
@@ -73,7 +73,10 @@ export default function DialogDocumentosCliente({
   const [salvando, setSalvando] = useState(false);
   const [deletando, setDeletando] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [arquivoAtual, setArquivoAtual] = useState<{ url: string; nome: string } | null>(null);
+  const [arquivoAtual, setArquivoAtual] = useState<{
+    url: string;
+    nome: string;
+  } | null>(null);
   const [docIdEditando, setDocIdEditando] = useState<string>("");
   const [removendoArquivo, setRemovendoArquivo] = useState(false);
 
@@ -98,7 +101,9 @@ export default function DialogDocumentosCliente({
     setDocIdEditando("");
     setArquivoAtual(null);
     setPendingFile(null);
-    pesquisarTiposDocumentosDisponiveis(clienteId).then(setTipos).catch(console.error);
+    pesquisarTiposDocumentosDisponiveis(clienteId)
+      .then(setTipos)
+      .catch(console.error);
     setDialogFormAberto(true);
   };
 
@@ -117,7 +122,9 @@ export default function DialogDocumentosCliente({
         : null,
     );
     setPendingFile(null);
-    pesquisarTiposDocumentosDisponiveis(clienteId, doc.id).then(setTipos).catch(console.error);
+    pesquisarTiposDocumentosDisponiveis(clienteId, doc.id)
+      .then(setTipos)
+      .catch(console.error);
     setDialogFormAberto(true);
   };
 
@@ -262,18 +269,19 @@ export default function DialogDocumentosCliente({
   const colunaArquivo = (doc: Documento) => {
     if (!doc.file_url) return <span className="text-color-secondary">—</span>;
     return (
-      <div className="flex align-items-center gap-1">
-        <span
-          className="text-sm text-color-secondary white-space-nowrap overflow-hidden text-overflow-ellipsis"
-          style={{ maxWidth: "120px" }}
-          title={doc.file_name}
-        >
-          {doc.file_name}
-        </span>
-        <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
-          <Button icon="pi pi-download" rounded text severity="info" />
-        </a>
-      </div>
+      <a
+        href={doc.file_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={doc.file_name}
+      >
+        <Tag
+          severity="info"
+          icon="pi pi-file"
+          value={doc.file_name}
+          className="cursor-pointer"
+        />
+      </a>
     );
   };
 
@@ -442,20 +450,28 @@ export default function DialogDocumentosCliente({
         <div className="field mb-3">
           <label className="font-bold block mb-2">Arquivo</label>
           {arquivoAtual && (
-            <div className="flex align-items-center gap-2 mb-2 p-2 border-round surface-100">
-              <i className="pi pi-file text-color-secondary" />
-              <span className="text-sm flex-1 white-space-nowrap overflow-hidden text-overflow-ellipsis">
+            <div className="flex align-items-center gap-2 mb-2">
+              <i className="pi pi-paperclip text-color-secondary text-sm" />
+              <a
+                href={arquivoAtual.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline text-sm flex-1 white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                title={arquivoAtual.nome}
+              >
                 {arquivoAtual.nome}
-              </span>
+              </a>
               <Button
-                label="Remover"
-                icon="pi pi-trash"
+                icon="pi pi-times"
+                rounded
+                text
                 severity="danger"
                 size="small"
-                text
                 type="button"
                 loading={removendoArquivo}
                 onClick={removerArquivo}
+                tooltip="Remover arquivo"
+                tooltipOptions={{ position: "left" }}
               />
             </div>
           )}
