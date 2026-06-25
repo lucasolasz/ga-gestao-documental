@@ -1,6 +1,8 @@
 import { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import Layout from "@/layout/layout";
+import { createClient } from "@/lib/supabase/server";
+import { UserProvider } from "@/layout/context/usercontext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -28,10 +30,33 @@ export const viewport: Viewport = {
   width: "device-width",
 };
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export default async function AppLayout({ children }: AppLayoutProps) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userData = { nome: "", email: user?.email ?? "", perfil: "" };
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("nome, perfil")
+      .eq("id", user.id)
+      .single();
+
+    userData = {
+      nome: profile?.nome ?? "",
+      email: user?.email ?? "",
+      perfil: profile?.perfil ?? "",
+    };
+  }
+
   return (
     <Suspense fallback={null}>
-      <Layout>{children}</Layout>
+      <UserProvider user={userData}>
+        <Layout>{children}</Layout>
+      </UserProvider>
     </Suspense>
   );
 }

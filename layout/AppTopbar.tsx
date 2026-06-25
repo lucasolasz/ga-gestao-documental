@@ -8,6 +8,7 @@ import Image from "next/image";
 import { AppTopbarRef } from "@/types/layout";
 import { Menu } from "primereact/menu";
 import { logout } from "@/app/(auth)/login/auth/actions";
+import { useUser } from "./context/usercontext";
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
   const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } =
@@ -16,6 +17,8 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
   const topbarmenuRef = useRef(null);
   const topbarmenubuttonRef = useRef(null);
   const menuRef = useRef<Menu>(null);
+  const { nome, email } = useUser();
+  const displayName = nome || email;
 
   useImperativeHandle(ref, () => ({
     menubutton: menubuttonRef.current,
@@ -74,11 +77,11 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
       >
         <button
           type="button"
-          className="p-link layout-topbar-button"
+          className="p-link layout-topbar-button layout-topbar-profile-button"
           onClick={(e) => menuRef.current?.toggle(e)}
         >
           <i className="pi pi-user"></i>
-          <span>Profile</span>
+          <span>{displayName}</span>
         </button>
       </div>
     </div>
