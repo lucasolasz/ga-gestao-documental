@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getDriveClient } from "@/lib/google-drive";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
@@ -44,6 +45,21 @@ export async function DELETE(
   const { id } = await params;
 
   const supabase = await createClient();
+
+  const { data: client } = await supabase
+    .from("clients")
+    .select("drive_folder_id")
+    .eq("id", id)
+    .single();
+
+  if (client?.drive_folder_id) {
+    try {
+      const drive = getDriveClient();
+      await drive.files.delete({ fileId: client.drive_folder_id });
+    } catch {
+      // Don't block deletion if Drive fails
+    }
+  }
 
   const { error } = await supabase.from("clients").delete().eq("id", id);
 

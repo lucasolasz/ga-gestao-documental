@@ -66,3 +66,30 @@ export async function deletarDocumento(id: string): Promise<void> {
     throw new Error(err.error || "Erro ao excluir documento");
   }
 }
+
+export async function uploadArquivoDocumento(
+  documentId: string,
+  file: File,
+): Promise<{ file_url: string; file_name: string }> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`/api/documentos/${documentId}/arquivo`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Erro ao enviar arquivo");
+  }
+  return res.json();
+}
+
+export async function deletarArquivoDocumento(documentId: string): Promise<void> {
+  const res = await fetch(`/api/documentos/${documentId}/arquivo`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Erro ao remover arquivo");
+  }
+}

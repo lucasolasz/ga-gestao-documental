@@ -6,6 +6,7 @@ import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
+import { FileUpload, FileUploadSelectEvent } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
@@ -17,8 +18,10 @@ import { statusBodyTemplate } from "../../_components/dashboard/tabela-dashboard
 import {
   atualizarDocumento,
   criarDocumento,
+  deletarArquivoDocumento,
   deletarDocumento,
   pesquisarDocumentos,
+  uploadArquivoDocumento,
 } from "@/services/documento-service";
 import { pesquisarTiposDocumentosDisponiveis } from "@/services/tipodocumento-service";
 import { Documento } from "@/types/entidades-banco/documento";
@@ -60,6 +63,7 @@ export default function DialogDocumentosCliente({
   onHide,
 }: Props) {
   const toast = useRef<Toast>(null);
+  const fileUploadRef = useRef<FileUpload>(null);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [tipos, setTipos] = useState<TipoDocumento[]>([]);
   const [dialogFormAberto, setDialogFormAberto] = useState(false);
@@ -68,6 +72,10 @@ export default function DialogDocumentosCliente({
     useState<Documento | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [deletando, setDeletando] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [arquivoAtual, setArquivoAtual] = useState<{ url: string; nome: string } | null>(null);
+  const [docIdEditando, setDocIdEditando] = useState<string>("");
+  const [removendoArquivo, setRemovendoArquivo] = useState(false);
 
   const {
     control,
@@ -87,6 +95,9 @@ export default function DialogDocumentosCliente({
 
   const abrirNovo = async () => {
     reset(documentoVazio);
+    setDocIdEditando("");
+    setArquivoAtual(null);
+    setPendingFile(null);
     pesquisarTiposDocumentosDisponiveis(clienteId).then(setTipos).catch(console.error);
     setDialogFormAberto(true);
   };
@@ -99,18 +110,54 @@ export default function DialogDocumentosCliente({
       data_emissao: doc.data_emissao ?? "",
       data_validade: doc.data_validade ?? "",
     });
+    setDocIdEditando(doc.id);
+    setArquivoAtual(
+      doc.file_url && doc.file_name
+        ? { url: doc.file_url, nome: doc.file_name }
+        : null,
+    );
+    setPendingFile(null);
     pesquisarTiposDocumentosDisponiveis(clienteId, doc.id).then(setTipos).catch(console.error);
     setDialogFormAberto(true);
   };
 
   const fecharForm = () => {
     reset(documentoVazio);
+    setDocIdEditando("");
+    setArquivoAtual(null);
+    setPendingFile(null);
+    fileUploadRef.current?.clear();
     setDialogFormAberto(false);
   };
 
   const confirmarDeletar = (doc: Documento) => {
     setDocumentoSelecionado(doc);
     setDialogDeletar(true);
+  };
+
+  const removerArquivo = async () => {
+    if (!docIdEditando) return;
+    setRemovendoArquivo(true);
+    try {
+      await deletarArquivoDocumento(docIdEditando);
+      setArquivoAtual(null);
+      recarregar();
+      toast.current?.show({
+        severity: "success",
+        summary: "Sucesso",
+        detail: "Arquivo removido",
+        life: 3000,
+      });
+    } catch (err) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Erro",
+        detail: err instanceof Error ? err.message : "Erro desconhecido",
+        life: 3000,
+      });
+    } finally {
+      setRemovendoArquivo(false);
+    }
   };
 
   const onSalvar = async (data: DocumentoForm) => {
@@ -123,8 +170,11 @@ export default function DialogDocumentosCliente({
         data_validade: data.data_validade || undefined,
       };
 
+      let docId: string;
+
       if (data.id) {
         await atualizarDocumento(data.id, payload);
+        docId = data.id;
         toast.current?.show({
           severity: "success",
           summary: "Sucesso",
@@ -132,11 +182,22 @@ export default function DialogDocumentosCliente({
           life: 3000,
         });
       } else {
-        await criarDocumento({ ...payload, client_id: clienteId });
+        const novo = await criarDocumento({ ...payload, client_id: clienteId });
+        docId = novo.id;
         toast.current?.show({
           severity: "success",
           summary: "Sucesso",
           detail: "Documento criado",
+          life: 3000,
+        });
+      }
+
+      if (pendingFile) {
+        await uploadArquivoDocumento(docId, pendingFile);
+        toast.current?.show({
+          severity: "success",
+          summary: "Sucesso",
+          detail: "Arquivo enviado",
           life: 3000,
         });
       }
@@ -198,6 +259,24 @@ export default function DialogDocumentosCliente({
     </div>
   );
 
+  const colunaArquivo = (doc: Documento) => {
+    if (!doc.file_url) return <span className="text-color-secondary">—</span>;
+    return (
+      <div className="flex align-items-center gap-1">
+        <span
+          className="text-sm text-color-secondary white-space-nowrap overflow-hidden text-overflow-ellipsis"
+          style={{ maxWidth: "120px" }}
+          title={doc.file_name}
+        >
+          {doc.file_name}
+        </span>
+        <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
+          <Button icon="pi pi-download" rounded text severity="info" />
+        </a>
+      </div>
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -236,6 +315,11 @@ export default function DialogDocumentosCliente({
               header: "Status",
               sortable: false,
               body: statusBodyTemplate,
+            },
+            {
+              header: "Arquivo",
+              sortable: false,
+              body: colunaArquivo,
             },
             {
               header: "Ações",
@@ -352,6 +436,47 @@ export default function DialogDocumentosCliente({
                 className="w-full"
               />
             )}
+          />
+        </div>
+
+        <div className="field mb-3">
+          <label className="font-bold block mb-2">Arquivo</label>
+          {arquivoAtual && (
+            <div className="flex align-items-center gap-2 mb-2 p-2 border-round surface-100">
+              <i className="pi pi-file text-color-secondary" />
+              <span className="text-sm flex-1 white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                {arquivoAtual.nome}
+              </span>
+              <Button
+                label="Remover"
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                text
+                type="button"
+                loading={removendoArquivo}
+                onClick={removerArquivo}
+              />
+            </div>
+          )}
+          <FileUpload
+            ref={fileUploadRef}
+            mode="advanced"
+            multiple={false}
+            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+            maxFileSize={30 * 1024 * 1024}
+            auto={false}
+            chooseLabel="Selecionar arquivo"
+            uploadLabel="Enviar"
+            cancelLabel="Cancelar"
+            onSelect={(e: FileUploadSelectEvent) => setPendingFile(e.files[0])}
+            onClear={() => setPendingFile(null)}
+            onRemove={() => setPendingFile(null)}
+            emptyTemplate={
+              <p className="m-0 text-color-secondary text-sm">
+                Arraste um arquivo ou clique para selecionar
+              </p>
+            }
           />
         </div>
       </CrudDialog>

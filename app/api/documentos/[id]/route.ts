@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getDriveClient, isFolderEmpty, nameToKey } from "@/lib/google-drive";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
@@ -54,6 +55,38 @@ export async function DELETE(
   const { id } = await params;
 
   const supabase = await createClient();
+
+  const { data: doc } = await supabase
+    .from("documents")
+    .select("file_url, client:clients(drive_folder_id), tipo:tipos_documentos(descricao)")
+    .eq("id", id)
+    .single();
+
+  if (doc?.file_url) {
+    try {
+      const drive = getDriveClient();
+      const fileId = new URL(doc.file_url).searchParams.get("id");
+      if (fileId) await drive.files.delete({ fileId });
+
+      const clientFolderId = (doc.client as { drive_folder_id?: string })?.drive_folder_id;
+      const tipoDescricao = (doc.tipo as { descricao?: string })?.descricao;
+
+      if (clientFolderId && tipoDescricao) {
+        const tipoKey = nameToKey(tipoDescricao);
+        const escaped = tipoKey.replace(/'/g, "\\'");
+        const folderRes = await drive.files.list({
+          q: `name='${escaped}' and mimeType='application/vnd.google-apps.folder' and '${clientFolderId}' in parents and trashed=false`,
+          fields: "files(id)",
+        });
+        const tipoFolderId = folderRes.data.files?.[0]?.id;
+        if (tipoFolderId && (await isFolderEmpty(drive, tipoFolderId))) {
+          await drive.files.delete({ fileId: tipoFolderId });
+        }
+      }
+    } catch {
+      // Don't block deletion if Drive cleanup fails
+    }
+  }
 
   const { error } = await supabase.from("documents").delete().eq("id", id);
 
