@@ -8,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { FileUpload, FileUploadSelectEvent } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
+import { Panel } from "primereact/panel";
 import { ProgressBar } from "primereact/progressbar";
 import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
@@ -81,6 +82,8 @@ export default function DialogDocumentosCliente({
   const [docIdEditando, setDocIdEditando] = useState<string>("");
   const [removendoArquivo, setRemovendoArquivo] = useState(false);
   const [uploadando, setUploadando] = useState(false);
+  const [tiposDisponiveis, setTiposDisponiveis] = useState<TipoDocumento[]>([]);
+  const [painelExpandido, setPainelExpandido] = useState(false);
 
   const {
     control,
@@ -89,10 +92,17 @@ export default function DialogDocumentosCliente({
     formState: { errors },
   } = useForm<DocumentoForm>({ defaultValues: documentoVazio });
 
-  const recarregar = () =>
-    pesquisarDocumentos(undefined, clienteId)
+  const recarregarTiposDisponiveis = () =>
+    pesquisarTiposDocumentosDisponiveis(clienteId)
+      .then(setTiposDisponiveis)
+      .catch(console.error);
+
+  const recarregar = () => {
+    pesquisarDocumentos(undefined, clienteId, true)
       .then(setDocumentos)
       .catch(console.error);
+    recarregarTiposDisponiveis();
+  };
 
   useEffect(() => {
     recarregar();
@@ -293,6 +303,77 @@ export default function DialogDocumentosCliente({
         modal
         onHide={onHide}
       >
+        {(() => {
+          const LIMIT = 10;
+          const tiposPreenchidos = documentos
+            .map((d) => d.tipo)
+            .filter((t): t is TipoDocumento => !!t);
+          const preenchidosVisiveis = painelExpandido
+            ? tiposPreenchidos
+            : tiposPreenchidos.slice(0, LIMIT);
+          const faltandoVisiveis = painelExpandido
+            ? tiposDisponiveis
+            : tiposDisponiveis.slice(0, LIMIT);
+          const totalOculto =
+            Math.max(0, tiposPreenchidos.length - LIMIT) +
+            Math.max(0, tiposDisponiveis.length - LIMIT);
+          const temMais = totalOculto > 0;
+
+          return (
+            <Panel header="Cobertura Documental" toggleable className="mb-3">
+              <div className="grid">
+                <div className="col-6">
+                  <span className="font-bold text-sm">
+                    Preenchidos ({tiposPreenchidos.length})
+                  </span>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {preenchidosVisiveis.map((t) => (
+                      <Tag key={t.id} value={t.descricao} severity="success" />
+                    ))}
+                    {tiposPreenchidos.length === 0 && (
+                      <span className="text-color-secondary text-sm">Nenhum</span>
+                    )}
+                  </div>
+                </div>
+                <div className="col-6">
+                  <span className="font-bold text-sm">
+                    Faltando ({tiposDisponiveis.length})
+                  </span>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {faltandoVisiveis.map((t) => (
+                      <Tag key={t.id} value={t.descricao} severity="primary" />
+                    ))}
+                    {tiposDisponiveis.length === 0 && (
+                      <span className="text-color-secondary text-sm">Nenhum</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {temMais && (
+                <div className="mt-2">
+                  <Button
+                    label={
+                      painelExpandido
+                        ? "Ver menos"
+                        : `Ver mais +${totalOculto} tipos`
+                    }
+                    link
+                    icon={
+                      painelExpandido
+                        ? "pi pi-chevron-up"
+                        : "pi pi-chevron-down"
+                    }
+                    iconPos="right"
+                    type="button"
+                    onClick={() => setPainelExpandido((p) => !p)}
+                    className="p-0 text-sm"
+                  />
+                </div>
+              )}
+            </Panel>
+          );
+        })()}
+
         <TabelaGenerica
           value={documentos}
           titulo="Documentos"

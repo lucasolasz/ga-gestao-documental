@@ -38,7 +38,10 @@ export async function GET(request: NextRequest) {
     query = query.eq("client_id", client_id);
   }
 
-  query = query.not("data_validade", "is", null);
+  const incluirSemValidade = searchParams.get("incluir_sem_validade") === "true";
+  if (!incluirSemValidade) {
+    query = query.not("data_validade", "is", null);
+  }
 
   const { data, error, count } = await query
     .order("data_validade")

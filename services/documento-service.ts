@@ -14,10 +14,12 @@ type DocumentPayload = {
 export async function pesquisarDocumentos(
   termo?: string,
   clientId?: string,
+  incluirSemValidade?: boolean,
 ): Promise<Documento[]> {
   const params = new URLSearchParams();
   if (termo) params.set("termo", termo);
   if (clientId) params.set("client_id", clientId);
+  if (incluirSemValidade) params.set("incluir_sem_validade", "true");
   const query = params.toString() ? `?${params.toString()}` : "";
   const res = await fetch(`/api/documentos${query}`);
   if (!res.ok) throw new Error("Erro ao buscar documentos");
