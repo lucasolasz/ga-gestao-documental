@@ -212,7 +212,9 @@ export default function DialogDocumentosCliente({
       toast.current?.show({
         severity: "success",
         summary: "Sucesso",
-        detail: isEdicao ? "Documento atualizado com sucesso" : "Documento criado com sucesso",
+        detail: isEdicao
+          ? "Documento atualizado com sucesso"
+          : "Documento criado com sucesso",
         life: 3000,
       });
 
@@ -331,20 +333,28 @@ export default function DialogDocumentosCliente({
                       <Tag key={t.id} value={t.descricao} severity="success" />
                     ))}
                     {tiposPreenchidos.length === 0 && (
-                      <span className="text-color-secondary text-sm">Nenhum</span>
+                      <span className="text-color-secondary text-sm">
+                        Nenhum
+                      </span>
                     )}
                   </div>
                 </div>
                 <div className="col-6">
                   <span className="font-bold text-sm">
-                    Faltando ({tiposDisponiveis.length})
+                    Faltandos ({tiposDisponiveis.length})
                   </span>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {faltandoVisiveis.map((t) => (
-                      <Tag key={t.id} value={t.descricao} severity="primary" />
+                      <Tag
+                        key={t.id}
+                        value={t.descricao}
+                        style={{ background: "#808080" }}
+                      />
                     ))}
                     {tiposDisponiveis.length === 0 && (
-                      <span className="text-color-secondary text-sm">Nenhum</span>
+                      <span className="text-color-secondary text-sm">
+                        Nenhum
+                      </span>
                     )}
                   </div>
                 </div>
@@ -573,7 +583,11 @@ export default function DialogDocumentosCliente({
             }
           />
           {uploadando && (
-            <ProgressBar mode="indeterminate" className="mt-2" style={{ height: "4px" }} />
+            <ProgressBar
+              mode="indeterminate"
+              className="mt-2"
+              style={{ height: "4px" }}
+            />
           )}
         </div>
       </CrudDialog>
