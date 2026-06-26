@@ -101,6 +101,12 @@ export default function TabelaClientes({ titulo }: TabelaClientesProps) {
             sortable: false,
             body: (row: ClienteForm) => row.categoria?.descricao ?? "—",
           },
+          {
+            header: "Documentos",
+            sortable: false,
+            body: (row: ClienteForm) =>
+              `${row.documentos_count ?? 0}/${row.tipos_categoria_count ?? 0}`,
+          },
           { field: "cnpj", header: "CNPJ", sortable: true },
           { field: "telefone", header: "Telefone", sortable: false },
           {
