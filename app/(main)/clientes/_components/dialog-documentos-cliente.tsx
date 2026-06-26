@@ -175,19 +175,12 @@ export default function DialogDocumentosCliente({
           <Controller
             name="numero"
             control={control}
-            rules={{ required: "Número é obrigatório" }}
             render={({ field }) => (
-              <>
-                <InputText
-                  id="numero"
-                  {...field}
-                  autoFocus
-                  className={classNames({ "p-invalid": errors.numero })}
-                />
-                {errors.numero && (
-                  <small className="p-error">{errors.numero.message}</small>
-                )}
-              </>
+              <InputText
+                id="numero"
+                {...field}
+                autoFocus
+              />
             )}
           />
         </div>
