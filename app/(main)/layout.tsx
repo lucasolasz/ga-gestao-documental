@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Layout from "@/layout/layout";
 import { getCurrentUser } from "@/lib/get-current-user";
 import { UserProvider } from "@/layout/context/usercontext";
+import IdleTimeoutGuard from "@/components/IdleTimeoutGuard";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -37,6 +38,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     <Suspense fallback={null}>
       <UserProvider user={userData}>
         <Layout>{children}</Layout>
+        <IdleTimeoutGuard />
       </UserProvider>
     </Suspense>
   );
