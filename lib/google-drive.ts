@@ -10,7 +10,11 @@ export function getDriveClient(): drive_v3.Drive {
 }
 
 export function nameToKey(name: string): string {
-  return name.toUpperCase().replace(/\s+/g, "_");
+  return name
+    .normalize("NFD")
+    .replace(/\p{Mn}/gu, "")
+    .toUpperCase()
+    .replace(/\s+/g, "_");
 }
 
 export async function getOrCreateFolder(
