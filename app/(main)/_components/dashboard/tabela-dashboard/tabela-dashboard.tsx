@@ -33,7 +33,15 @@ export default function TabelaDashboard({
         columns={[
           { field: "client.nome", header: "Nome Cliente", sortable: true },
           { field: "client.cnpj", header: "CNPJ", sortable: true },
-          { field: "numero", header: "Documento", sortable: true },
+          {
+            field: "numero",
+            header: "Documento",
+            sortable: true,
+            body: (documento: Documento) =>
+              documento.numero || (
+                <span className="text-color-secondary">—</span>
+              ),
+          },
           { field: "tipo.descricao", header: "Tipo Documento", sortable: true },
           {
             field: "data_validade",
