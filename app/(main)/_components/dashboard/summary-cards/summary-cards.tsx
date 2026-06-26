@@ -22,6 +22,7 @@ const cards = [
     description: "Documentos já expirados",
     severity: "danger",
     hexColor: "#ef4444",
+    bgColor: "#fef2f2",
     icon: "pi pi-times-circle",
   },
   {
@@ -30,6 +31,7 @@ const cards = [
     description: "Vencem em até 30 dias",
     severity: "warning",
     hexColor: "#f97316",
+    bgColor: "#fff7ed",
     icon: "pi pi-exclamation-circle",
   },
   {
@@ -38,6 +40,7 @@ const cards = [
     description: "Vencem em até 90 dias",
     severity: "info",
     hexColor: "#0ea5e9",
+    bgColor: "#f0f9ff",
     icon: "pi pi-calendar",
   },
   {
@@ -46,6 +49,7 @@ const cards = [
     description: "Dentro do prazo",
     severity: "success",
     hexColor: "#22c55e",
+    bgColor: "#f0fdf4",
     icon: "pi pi-check-circle",
   },
 ];
@@ -73,6 +77,7 @@ export default function SummaryCards({
                 border: "2px solid",
                 borderColor: isActive ? card.hexColor : "#cdcdcd",
                 opacity: isActive ? 1 : 0.9,
+                backgroundColor: card.bgColor,
               }}
               onClick={() => handleClick(card.key)}
             >
