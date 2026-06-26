@@ -51,6 +51,7 @@ export default function DialogDocumentosCliente({
     deletando,
     removendoArquivo,
     uploadando,
+    loadingTipos,
     pendingFile,
     setPendingFile,
     arquivoAtual,
@@ -134,9 +135,7 @@ export default function DialogDocumentosCliente({
               header: "Número do Documento",
               sortable: true,
               body: (row: Documento) =>
-                row.numero || (
-                  <span className="text-color-secondary">—</span>
-                ),
+                row.numero || <span className="text-color-secondary">—</span>,
             },
             {
               header: "Tipo do Documento",
@@ -224,6 +223,8 @@ export default function DialogDocumentosCliente({
                   optionValue="id"
                   placeholder="Selecione um tipo"
                   filter
+                  loading={loadingTipos}
+                  disabled={loadingTipos}
                   className={classNames("w-full", { "p-invalid": errors.tipo })}
                 />
                 {errors.tipo && (

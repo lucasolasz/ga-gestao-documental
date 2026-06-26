@@ -49,6 +49,7 @@ export function useDocumentosCliente(clienteId: string) {
   const [docIdEditando, setDocIdEditando] = useState<string>("");
   const [removendoArquivo, setRemovendoArquivo] = useState(false);
   const [uploadando, setUploadando] = useState(false);
+  const [loadingTipos, setLoadingTipos] = useState(false);
 
   const {
     control,
@@ -78,9 +79,11 @@ export function useDocumentosCliente(clienteId: string) {
     setDocIdEditando("");
     setArquivoAtual(null);
     setPendingFile(null);
+    setLoadingTipos(true);
     pesquisarTiposDocumentosDisponiveis(clienteId)
       .then(setTipos)
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoadingTipos(false));
     setDialogFormAberto(true);
   };
 
@@ -99,9 +102,11 @@ export function useDocumentosCliente(clienteId: string) {
         : null,
     );
     setPendingFile(null);
+    setLoadingTipos(true);
     pesquisarTiposDocumentosDisponiveis(clienteId, doc.id)
       .then(setTipos)
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoadingTipos(false));
     setDialogFormAberto(true);
   };
 
@@ -237,6 +242,7 @@ export function useDocumentosCliente(clienteId: string) {
     deletando,
     removendoArquivo,
     uploadando,
+    loadingTipos,
     pendingFile,
     setPendingFile,
     arquivoAtual,
