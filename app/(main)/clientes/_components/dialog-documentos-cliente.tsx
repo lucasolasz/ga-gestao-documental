@@ -77,7 +77,7 @@ export default function DialogDocumentosCliente({
       />
       <Button
         icon="pi pi-trash"
-        label="Excluir"
+        rounded
         severity="warning"
         onClick={() => confirmarDeletar(doc)}
       />
