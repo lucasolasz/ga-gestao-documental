@@ -10,16 +10,16 @@ interface AppLayoutProps {
 }
 
 export const metadata: Metadata = {
-  title: "GA SOLUÇÕES - Controle de Documentos",
+  title: {
+    template: "GA SOLUÇÕES - %s",
+    default: "GA SOLUÇÕES - Dashboard",
+  },
   description: "Controle de validade de documentos para clientes",
   robots: { index: false, follow: false },
   openGraph: {
     type: "website",
     title: "GA SOLUÇÕES - Controle de Documentos",
-    url: "https://sakai.primereact.org/",
     description: "Controle de validade de documentos para clientes",
-    images: ["https://www.primefaces.org/static/social/sakai-react.png"],
-    ttl: 604800,
   },
   icons: {
     icon: "/favicon.ico",
