@@ -9,6 +9,7 @@ import { classNames } from "primereact/utils";
 import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 
+import { formatDate } from "@/utils/dateUtil";
 import { pesquisarCategorias } from "@/services/categoria-service";
 import {
   atualizarCliente,
@@ -109,6 +110,11 @@ export default function TabelaClientes({ titulo }: TabelaClientesProps) {
           },
           { field: "cnpj", header: "CNPJ", sortable: true },
           { field: "telefone", header: "Telefone", sortable: false },
+          {
+            header: "Cadastrado em",
+            sortable: true,
+            body: (row: ClienteForm) => formatDate(row.created_at) || "—",
+          },
           {
             header: "Ações",
             body: colunaAcoes,
