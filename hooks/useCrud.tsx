@@ -30,7 +30,7 @@ export function useCrud<T extends { id: number | string }>(
   const router = useRouter();
   const toast = useRef<Toast>(null);
 
-  const [items, setItems] = useState<T[]>([]);
+  const [items, setItems] = useState<T[] | undefined>(undefined);
 
   const buscar = useCallback(() => {
     fetchFn?.().then(setItems).catch(console.error);

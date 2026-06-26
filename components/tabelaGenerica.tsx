@@ -27,7 +27,7 @@ export interface ColumnDef<T> {
 }
 
 interface TabelaGenericaProps<T> {
-  value: T[];
+  value: T[] | undefined;
   titulo: string;
   columns: ColumnDef<T>[];
   toolbarEsquerda?: ReactNode;
@@ -67,6 +67,7 @@ const TabelaGenerica = forwardRef(
     }));
 
     const filteredValue = useMemo(() => {
+      if (value === undefined) return [];
       const search = globalFilterValue.trim().toLowerCase();
       if (!search) return value;
 
@@ -113,8 +114,8 @@ const TabelaGenerica = forwardRef(
     );
 
     const footer = globalFilterValue.trim()
-      ? `Exibindo ${filteredValue.length} de ${value.length} registro(s)`
-      : `Total: ${value.length} registro(s)`;
+      ? `Exibindo ${filteredValue.length} de ${value?.length ?? 0} registro(s)`
+      : `Total: ${value?.length ?? 0} registro(s)`;
 
     return (
       <div className="card p-4">
@@ -128,6 +129,7 @@ const TabelaGenerica = forwardRef(
         <DataTable
           ref={dtRef}
           value={filteredValue}
+          loading={value === undefined}
           paginator
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
