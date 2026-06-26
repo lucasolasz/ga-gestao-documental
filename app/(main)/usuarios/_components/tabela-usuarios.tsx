@@ -13,7 +13,7 @@ import TabelaGenerica from "@/components/tabelaGenerica";
 import CrudDialog from "@/components/crudDialog";
 import ConfirmarExclusaoDialog from "@/components/confirmarExclusaoDialog";
 import { useCrud } from "@/hooks/useCrud";
-import { UsuarioForm, PERFIS_ACESSO } from "@/types/entidades-banco/usuario";
+import { UsuarioForm, PERFIS_GERENCIAVEIS } from "@/types/entidades-banco/usuario";
 import {
   pesquisarUsuarios,
   criarUsuario,
@@ -57,7 +57,7 @@ export default function TabelaUsuarios({ titulo }: TabelaUsuariosProps) {
   const isEdicao = !!id;
 
   const labelPerfil = (valor: string) =>
-    PERFIS_ACESSO.find((p) => p.valor === valor)?.label ?? valor;
+    PERFIS_GERENCIAVEIS.find((p) => p.valor === valor)?.label ?? valor;
 
   return (
     <>
@@ -186,7 +186,7 @@ export default function TabelaUsuarios({ titulo }: TabelaUsuariosProps) {
                 <Dropdown
                   id="perfil"
                   {...field}
-                  options={[...PERFIS_ACESSO]}
+                  options={[...PERFIS_GERENCIAVEIS]}
                   optionLabel="label"
                   optionValue="valor"
                   placeholder="Selecione um perfil"

@@ -1,11 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
 
 import Link from "next/link";
 import AppMenuitem from "./AppMenuitem";
 import { MenuProvider } from "./context/menucontext";
 import { AppMenuItem } from "@/types/layout";
+import { useUser } from "@/layout/context/usercontext";
 
 const AppMenu = () => {
+  const { perfil } = useUser();
+
   const model: AppMenuItem[] = [
     {
       label: "Home",
@@ -34,11 +38,9 @@ const AppMenu = () => {
     {
       label: "Administrativo",
       items: [
-        {
-          label: "Usuários",
-          icon: "pi pi-fw pi-users",
-          to: "/usuarios",
-        },
+        ...(perfil !== "viewer"
+          ? [{ label: "Usuários", icon: "pi pi-fw pi-users", to: "/usuarios" }]
+          : []),
       ],
     },
   ];

@@ -6,6 +6,10 @@ export const PERFIS_ACESSO = [
   { valor: "viewer", label: "Visualizador (Apenas Leitura)" },
 ] as const;
 
+export const PERFIS_GERENCIAVEIS = PERFIS_ACESSO.filter(
+  (p) => p.valor !== "desenvolvedor",
+);
+
 export interface UsuarioForm {
   id: string;
   email: string;
