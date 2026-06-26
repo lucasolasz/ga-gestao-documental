@@ -245,6 +245,13 @@ export default function TabelaClientes({ titulo }: TabelaClientesProps) {
           <span>
             Tem certeza que deseja excluir o cliente{" "}
             <b>{itemSelecionado.nome}</b>?
+            {(itemSelecionado.documentos_count ?? 0) > 0 && (
+              <span className="p-error block mt-4">
+                Este cliente possui <b>{itemSelecionado.documentos_count}</b>{" "}
+                documento(s) cadastrado(s) que também serão excluídos
+                permanentemente.
+              </span>
+            )}
           </span>
         }
       />
