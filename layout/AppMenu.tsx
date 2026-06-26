@@ -36,9 +36,8 @@ const AppMenu = () => {
       items: [
         {
           label: "Usuários",
-          icon: "pi pi-fw pi-eye",
-          to: "/blocks",
-          badge: "NEW",
+          icon: "pi pi-fw pi-users",
+          to: "/usuarios",
         },
       ],
     },
