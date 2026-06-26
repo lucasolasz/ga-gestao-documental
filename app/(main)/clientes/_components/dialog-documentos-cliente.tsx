@@ -76,7 +76,7 @@ export default function DialogDocumentosCliente({
       />
       <Button
         icon="pi pi-trash"
-        rounded
+        label="Excluir"
         severity="warning"
         onClick={() => confirmarDeletar(doc)}
       />
@@ -176,11 +176,7 @@ export default function DialogDocumentosCliente({
             name="numero"
             control={control}
             render={({ field }) => (
-              <InputText
-                id="numero"
-                {...field}
-                autoFocus
-              />
+              <InputText id="numero" {...field} autoFocus />
             )}
           />
         </div>
@@ -266,55 +262,64 @@ export default function DialogDocumentosCliente({
           <label className="font-bold block mb-2">Arquivo</label>
           {arquivoAtual && (
             <div className="flex align-items-center gap-2 mb-2">
-              <i className="pi pi-paperclip text-color-secondary text-sm" />
+              <i className="pi pi-paperclip text-color-secondary text-md" />
               <a
                 href={arquivoAtual.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline text-sm flex-1 white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                className="text-primary hover:underline text-md flex-1 white-space-nowrap overflow-hidden text-overflow-ellipsis"
                 title={arquivoAtual.nome}
               >
                 {arquivoAtual.nome}
               </a>
-              <Button
-                icon="pi pi-times"
-                rounded
-                text
-                severity="danger"
-                size="small"
-                type="button"
-                loading={removendoArquivo}
-                onClick={removerArquivo}
-                tooltip="Remover arquivo"
-                tooltipOptions={{ position: "left" }}
-              />
+              <div>
+                <Button
+                  icon="pi pi-times"
+                  rounded
+                  text
+                  severity="danger"
+                  size="small"
+                  type="button"
+                  loading={removendoArquivo}
+                  onClick={removerArquivo}
+                  tooltip="Remover arquivo"
+                  tooltipOptions={{ position: "left" }}
+                  label="Excluir"
+                />
+              </div>
             </div>
           )}
-          <FileUpload
-            ref={fileUploadRef}
-            mode="advanced"
-            multiple={false}
-            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-            maxFileSize={30 * 1024 * 1024}
-            auto={false}
-            chooseLabel="Selecionar arquivo"
-            cancelLabel="Cancelar"
-            uploadOptions={{ className: "hidden" }}
-            onSelect={(e: FileUploadSelectEvent) => setPendingFile(e.files[0])}
-            onClear={() => setPendingFile(null)}
-            onRemove={() => setPendingFile(null)}
-            emptyTemplate={
-              <p className="m-0 text-color-secondary text-sm">
-                Arraste um arquivo ou clique para selecionar
-              </p>
-            }
-          />
-          {uploadando && (
-            <ProgressBar
-              mode="indeterminate"
-              className="mt-2"
-              style={{ height: "4px" }}
-            />
+          {!arquivoAtual && (
+            <>
+              <FileUpload
+                ref={fileUploadRef}
+                mode="advanced"
+                multiple={false}
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                maxFileSize={30 * 1024 * 1024}
+                auto={false}
+                chooseLabel="Selecionar arquivo"
+                cancelLabel="Cancelar"
+                uploadOptions={{ className: "hidden" }}
+                onSelect={(e: FileUploadSelectEvent) =>
+                  setPendingFile(e.files[0])
+                }
+                onClear={() => setPendingFile(null)}
+                onRemove={() => setPendingFile(null)}
+                emptyTemplate={
+                  <p className="m-0 text-color-secondary text-sm">
+                    Arraste um arquivo ou clique para selecionar
+                  </p>
+                }
+              />
+              {uploadando && (
+                <ProgressBar
+                  mode="indeterminate"
+                  className="mt-2"
+                  style={{ height: "4px" }}
+                />
+              )}
+            </>
           )}
         </div>
       </CrudDialog>
