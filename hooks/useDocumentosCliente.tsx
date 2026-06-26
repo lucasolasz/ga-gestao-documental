@@ -174,6 +174,11 @@ export function useDocumentosCliente(clienteId: string) {
         setUploadando(true);
         try {
           await uploadArquivoDocumento(docId, pendingFile);
+        } catch (uploadErr) {
+          if (!isEdicao) {
+            try { await deletarDocumento(docId); } catch {}
+          }
+          throw uploadErr;
         } finally {
           setUploadando(false);
         }

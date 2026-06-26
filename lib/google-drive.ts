@@ -21,13 +21,13 @@ export async function getOrCreateFolder(
   drive: drive_v3.Drive,
   nameKey: string,
   parentId: string,
-): Promise<string> {
+): Promise<{ id: string; created: boolean }> {
   const escaped = nameKey.replace(/'/g, "\\'");
   const res = await drive.files.list({
     q: `name='${escaped}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`,
     fields: "files(id)",
   });
-  if (res.data.files?.[0]?.id) return res.data.files[0].id;
+  if (res.data.files?.[0]?.id) return { id: res.data.files[0].id, created: false };
 
   const created = await drive.files.create({
     requestBody: {
@@ -37,7 +37,7 @@ export async function getOrCreateFolder(
     },
     fields: "id",
   });
-  return created.data.id!;
+  return { id: created.data.id!, created: true };
 }
 
 export async function isFolderEmpty(

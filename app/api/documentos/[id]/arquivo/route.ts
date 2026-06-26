@@ -43,63 +43,92 @@ export async function POST(
   const d = doc as unknown as DocWithRelations;
   const drive = getDriveClient();
 
-  // Resolve client folder
-  let clientFolderId = d.client.drive_folder_id;
-  if (!clientFolderId) {
-    clientFolderId = await getOrCreateFolder(
-      drive,
-      nameToKey(d.client.nome),
-      process.env.GOOGLE_DRIVE_FOLDER_ID!,
-    );
-    await supabase
-      .from("clients")
-      .update({ drive_folder_id: clientFolderId })
-      .eq("id", d.client.id);
-  }
+  let clientFolderId: string | null = d.client.drive_folder_id;
+  let clientFolderCreated = false;
+  let tipoFolderId: string | null = null;
+  let tipoFolderCreated = false;
+  let uploadedFileId: string | null = null;
 
-  // Resolve tipo subfolder
-  const tipoFolderId = await getOrCreateFolder(
-    drive,
-    nameToKey(d.tipo?.descricao ?? "SEM_TIPO"),
-    clientFolderId,
-  );
-
-  // Delete previous file from Drive if exists
-  if (d.file_url) {
-    try {
-      const oldFileId = new URL(d.file_url).searchParams.get("id");
-      if (oldFileId) await drive.files.delete({ fileId: oldFileId });
-    } catch {
-      // Don't block upload
+  try {
+    if (!clientFolderId) {
+      const cf = await getOrCreateFolder(
+        drive,
+        nameToKey(d.client.nome),
+        process.env.GOOGLE_DRIVE_FOLDER_ID!,
+      );
+      clientFolderId = cf.id;
+      clientFolderCreated = cf.created;
+      if (cf.created) {
+        await supabase
+          .from("clients")
+          .update({ drive_folder_id: cf.id })
+          .eq("id", d.client.id);
+      }
     }
+
+    const tf = await getOrCreateFolder(
+      drive,
+      nameToKey(d.tipo?.descricao ?? "SEM_TIPO"),
+      clientFolderId,
+    );
+    tipoFolderId = tf.id;
+    tipoFolderCreated = tf.created;
+
+    if (d.file_url) {
+      try {
+        const oldFileId = new URL(d.file_url).searchParams.get("id");
+        if (oldFileId) await drive.files.delete({ fileId: oldFileId });
+      } catch {
+        // Don't block upload
+      }
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const uploaded = await drive.files.create({
+      requestBody: { name: file.name, parents: [tipoFolderId] },
+      media: { mimeType: file.type, body: Readable.from(buffer) },
+      fields: "id, name",
+    });
+
+    uploadedFileId = uploaded.data.id!;
+    const fileName = uploaded.data.name!;
+
+    await drive.permissions.create({
+      fileId: uploadedFileId,
+      requestBody: { role: "reader", type: "anyone" },
+    });
+
+    const fileUrl = `https://drive.google.com/uc?export=download&id=${uploadedFileId}`;
+
+    const { error } = await supabase
+      .from("documents")
+      .update({ file_url: fileUrl, file_name: fileName })
+      .eq("id", id);
+
+    if (error) throw new Error(error.message);
+
+    return NextResponse.json({ file_url: fileUrl, file_name: fileName });
+
+  } catch (err) {
+    if (uploadedFileId) {
+      await drive.files.delete({ fileId: uploadedFileId }).catch(() => {});
+    }
+    if (tipoFolderCreated && tipoFolderId) {
+      await drive.files.delete({ fileId: tipoFolderId }).catch(() => {});
+    }
+    if (clientFolderCreated && clientFolderId) {
+      await drive.files.delete({ fileId: clientFolderId }).catch(() => {});
+      try {
+        await supabase
+          .from("clients")
+          .update({ drive_folder_id: null })
+          .eq("id", d.client.id);
+      } catch {}
+    }
+
+    const msg = err instanceof Error ? err.message : "Erro no upload";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
-
-  // Upload new file
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const uploaded = await drive.files.create({
-    requestBody: { name: file.name, parents: [tipoFolderId] },
-    media: { mimeType: file.type, body: Readable.from(buffer) },
-    fields: "id, name",
-  });
-
-  const fileId = uploaded.data.id!;
-  const fileName = uploaded.data.name!;
-
-  await drive.permissions.create({
-    fileId,
-    requestBody: { role: "reader", type: "anyone" },
-  });
-
-  const fileUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
-  const { error } = await supabase
-    .from("documents")
-    .update({ file_url: fileUrl, file_name: fileName })
-    .eq("id", id);
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  return NextResponse.json({ file_url: fileUrl, file_name: fileName });
 }
 
 export async function DELETE(
@@ -123,7 +152,6 @@ export async function DELETE(
   const d = doc as unknown as DocWithRelations;
   const drive = getDriveClient();
 
-  // Delete file from Drive
   if (d.file_url) {
     try {
       const fileId = new URL(d.file_url).searchParams.get("id");
@@ -133,7 +161,6 @@ export async function DELETE(
     }
   }
 
-  // Remove tipo folder if now empty
   const clientFolderId = d.client?.drive_folder_id;
   const tipoDescricao = d.tipo?.descricao;
 
