@@ -19,19 +19,19 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (clienteError || !cliente?.categoria_id) {
-    return NextResponse.json({ documentosObrigatorios: [] });
+    return NextResponse.json({ tiposDocumentos: [] });
   }
 
   const { data: juncoes, error: juncoesError } = await supabase
-    .from("categorias_documentos_obrigatorios")
-    .select("documento_obrigatorio_id")
+    .from("categorias_tipos_documentos")
+    .select("tipo_documento_id")
     .eq("categoria_id", cliente.categoria_id);
 
   if (juncoesError || !juncoes?.length) {
-    return NextResponse.json({ documentosObrigatorios: [] });
+    return NextResponse.json({ tiposDocumentos: [] });
   }
 
-  const idsDaCategoria = juncoes.map((j) => j.documento_obrigatorio_id as string);
+  const idsDaCategoria = juncoes.map((j) => j.tipo_documento_id as string);
 
   let docsQuery = supabase
     .from("documents")
@@ -50,11 +50,11 @@ export async function GET(request: NextRequest) {
   const idsDisponiveis = idsDaCategoria.filter((id) => !tiposJaUsados.has(id));
 
   if (!idsDisponiveis.length) {
-    return NextResponse.json({ documentosObrigatorios: [] });
+    return NextResponse.json({ tiposDocumentos: [] });
   }
 
   const { data, error } = await supabase
-    .from("documentos_obrigatorios")
+    .from("tipos_documentos")
     .select("*")
     .in("id", idsDisponiveis)
     .order("descricao");
@@ -63,5 +63,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ documentosObrigatorios: data });
+  return NextResponse.json({ tiposDocumentos: data });
 }

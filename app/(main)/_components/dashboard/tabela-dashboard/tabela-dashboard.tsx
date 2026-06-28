@@ -44,7 +44,7 @@ export default function TabelaDashboard({
           },
           {
             field: "tipo.descricao",
-            header: "Documento Obrigatório",
+            header: "Tipo Documento",
             sortable: true,
           },
           {

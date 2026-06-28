@@ -29,9 +29,9 @@ const AppMenu = () => {
           to: "/categorias",
         },
         {
-          label: "Documentos Obrigatórios",
+          label: "Tipos de Documentos",
           icon: "pi pi-fw pi-file",
-          to: "/documentosobrigatorios",
+          to: "/tipodocumento",
         },
       ],
     },

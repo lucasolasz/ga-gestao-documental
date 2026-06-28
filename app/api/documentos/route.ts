@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from("documents")
-    .select("*, client:clients(*), tipo:documentos_obrigatorios(*)", {
+    .select("*, client:clients(*), tipo:tipos_documentos(*)", {
       count: "exact",
     });
 
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from("documents")
     .insert(payload)
-    .select("*, client:clients(*), tipo:documentos_obrigatorios(*)")
+    .select("*, client:clients(*), tipo:tipos_documentos(*)")
     .single();
 
   if (error) {

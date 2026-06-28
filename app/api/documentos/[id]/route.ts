@@ -36,7 +36,7 @@ export async function PUT(
     .from("documents")
     .update(payload)
     .eq("id", id)
-    .select("*, client:clients(*), tipo:documentos_obrigatorios(*)")
+    .select("*, client:clients(*), tipo:tipos_documentos(*)")
     .single();
 
   if (error) {
@@ -58,7 +58,7 @@ export async function DELETE(
 
   const { data: doc } = await supabase
     .from("documents")
-    .select("file_url, client:clients(drive_folder_id), tipo:documentos_obrigatorios(descricao)")
+    .select("file_url, client:clients(drive_folder_id), tipo:tipos_documentos(descricao)")
     .eq("id", id)
     .single();
 

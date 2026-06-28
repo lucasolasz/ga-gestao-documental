@@ -32,7 +32,7 @@ export async function POST(
 
   const { data: doc, error: docError } = await supabase
     .from("documents")
-    .select("file_url, file_name, client:clients(id, nome, drive_folder_id), tipo:documentos_obrigatorios(descricao)")
+    .select("file_url, file_name, client:clients(id, nome, drive_folder_id), tipo:tipos_documentos(descricao)")
     .eq("id", id)
     .single();
 
@@ -141,7 +141,7 @@ export async function DELETE(
 
   const { data: doc, error: docError } = await supabase
     .from("documents")
-    .select("file_url, client:clients(drive_folder_id), tipo:documentos_obrigatorios(descricao)")
+    .select("file_url, client:clients(drive_folder_id), tipo:tipos_documentos(descricao)")
     .eq("id", id)
     .single();
 

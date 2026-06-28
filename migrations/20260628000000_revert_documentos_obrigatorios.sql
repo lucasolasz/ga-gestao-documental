@@ -1,0 +1,9 @@
+ALTER TABLE documentos_obrigatorios RENAME TO tipos_documentos;
+
+ALTER TABLE categorias_documentos_obrigatorios RENAME TO categorias_tipos_documentos;
+ALTER TABLE categorias_tipos_documentos
+  RENAME COLUMN documento_obrigatorio_id TO tipo_documento_id;
+
+ALTER TABLE categorias_tipos_documentos
+  RENAME CONSTRAINT categorias_documentos_obrigatorios_documento_obrigatorio_id_fkey
+  TO categorias_tipos_documentos_tipo_documento_id_fkey;

@@ -10,28 +10,28 @@ import TabelaGenerica from "../../../../components/tabelaGenerica";
 import CrudDialog from "../../../../components/crudDialog";
 import ConfirmarExclusaoDialog from "../../../../components/confirmarExclusaoDialog";
 import { useCrud } from "../../../../hooks/useCrud";
-import { DocumentoObrigatorio } from "@/types/entidades-banco/documentoObrigatorio";
+import { TipoDocumento } from "@/types/entidades-banco/tipoDocumento";
 import {
-  pesquisarDocumentosObrigatorios,
-  criarDocumentoObrigatorio,
-  atualizarDocumentoObrigatorio,
-  deletarDocumentoObrigatorio as deletarDocumentoObrigatorioService,
-} from "@/services/documentoobrigatorio-service";
+  pesquisarTiposDocumentos,
+  criarTipoDocumento,
+  atualizarTipoDocumento,
+  deletarTipoDocumento as deletarTipoDocumentoService,
+} from "@/services/tipodocumento-service";
 
-interface TabelaDocumentosObrigatoriosProps {
+interface TabelaTipoDocumentoProps {
   titulo: string;
 }
 
-const documentoObrigatorioVazio: DocumentoObrigatorio = {
+const tipoDocumentoVazio: TipoDocumento = {
   id: "",
   descricao: "",
 };
 
-export default function TabelaDocumentosObrigatorios({
+export default function TabelaTipoDocumento({
   titulo,
-}: TabelaDocumentosObrigatoriosProps) {
+}: TabelaTipoDocumentoProps) {
   const {
-    items: documentosObrigatorios,
+    items: tiposDocumentos,
     control,
     handleSubmit,
     errors,
@@ -47,14 +47,14 @@ export default function TabelaDocumentosObrigatorios({
     colunaAcoes,
     salvar,
     deletar,
-  } = useCrud<DocumentoObrigatorio>(documentoObrigatorioVazio, pesquisarDocumentosObrigatorios);
+  } = useCrud<TipoDocumento>(tipoDocumentoVazio, pesquisarTiposDocumentos);
 
   return (
     <>
       <Toast ref={toast} />
 
       <TabelaGenerica
-        value={documentosObrigatorios}
+        value={tiposDocumentos}
         titulo={titulo}
         headerActions={
           <Button
@@ -77,15 +77,15 @@ export default function TabelaDocumentosObrigatorios({
 
       <CrudDialog
         visible={dialogAberto}
-        titulo="Detalhes do Documento Obrigatório"
+        titulo="Detalhes do Tipo de Documento"
         onHide={fechar}
         onSalvar={handleSubmit((data) =>
           salvar(data, {
-            criarFn: criarDocumentoObrigatorio,
-            atualizarFn: atualizarDocumentoObrigatorio,
+            criarFn: criarTipoDocumento,
+            atualizarFn: atualizarTipoDocumento,
             mensagens: {
-              criado: "Documento Obrigatório Criado",
-              atualizado: "Documento Obrigatório Atualizado",
+              criado: "Tipo de Documento Criado",
+              atualizado: "Tipo de Documento Atualizado",
             },
           }),
         )}
@@ -121,14 +121,14 @@ export default function TabelaDocumentosObrigatorios({
         onHide={() => setDialogDeletar(false)}
         onConfirmar={() =>
           deletar({
-            deletarFn: deletarDocumentoObrigatorioService,
-            mensagem: "Documento Obrigatório Excluído",
+            deletarFn: deletarTipoDocumentoService,
+            mensagem: "Tipo de Documento Excluído",
           })
         }
         deletando={deletando}
         descricao={
           <span>
-            Tem certeza que deseja excluir o documento obrigatório{" "}
+            Tem certeza que deseja excluir o tipo de documento{" "}
             <b>{itemSelecionado.descricao}</b>?
           </span>
         }

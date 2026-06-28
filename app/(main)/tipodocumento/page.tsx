@@ -1,7 +1,7 @@
 "use client";
 
-import TabelaDocumentosObrigatorios from "./_components/tabela-documentosobrigatorios";
+import TabelaTipoDocumento from "./_components/tabela-tipodocumento";
 
-export default function DocumentosObrigatoriosPage() {
-  return <TabelaDocumentosObrigatorios titulo="Documentos Obrigatórios" />;
+export default function TipoDocumentoPage() {
+  return <TabelaTipoDocumento titulo="Tipos de Documento" />;
 }

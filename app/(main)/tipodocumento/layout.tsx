@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Documentos Obrigatórios",
+  title: "Tipos de Documentos",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

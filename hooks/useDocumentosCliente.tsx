@@ -13,9 +13,9 @@ import {
   pesquisarDocumentos,
   uploadArquivoDocumento,
 } from "@/services/documento-service";
-import { pesquisarDocumentosObrigatoriosDisponiveis } from "@/services/documentoobrigatorio-service";
+import { pesquisarTiposDocumentosDisponiveis } from "@/services/tipodocumento-service";
 import { Documento } from "@/types/entidades-banco/documento";
-import { DocumentoObrigatorio } from "@/types/entidades-banco/documentoObrigatorio";
+import { TipoDocumento } from "@/types/entidades-banco/tipoDocumento";
 
 export interface DocumentoForm {
   id: string;
@@ -37,8 +37,8 @@ export function useDocumentosCliente(clienteId: string) {
   const toast = useRef<Toast>(null);
   const fileUploadRef = useRef<FileUpload>(null);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
-  const [tipos, setTipos] = useState<DocumentoObrigatorio[]>([]);
-  const [tiposDisponiveis, setTiposDisponiveis] = useState<DocumentoObrigatorio[]>([]);
+  const [tipos, setTipos] = useState<TipoDocumento[]>([]);
+  const [tiposDisponiveis, setTiposDisponiveis] = useState<TipoDocumento[]>([]);
   const [dialogFormAberto, setDialogFormAberto] = useState(false);
   const [dialogDeletar, setDialogDeletar] = useState(false);
   const [documentoSelecionado, setDocumentoSelecionado] = useState<Documento | null>(null);
@@ -59,7 +59,7 @@ export function useDocumentosCliente(clienteId: string) {
   } = useForm<DocumentoForm>({ defaultValues: documentoVazio });
 
   const recarregarTiposDisponiveis = () =>
-    pesquisarDocumentosObrigatoriosDisponiveis(clienteId)
+    pesquisarTiposDocumentosDisponiveis(clienteId)
       .then(setTiposDisponiveis)
       .catch(console.error);
 
@@ -80,7 +80,7 @@ export function useDocumentosCliente(clienteId: string) {
     setArquivoAtual(null);
     setPendingFile(null);
     setLoadingTipos(true);
-    pesquisarDocumentosObrigatoriosDisponiveis(clienteId)
+    pesquisarTiposDocumentosDisponiveis(clienteId)
       .then(setTipos)
       .catch(console.error)
       .finally(() => setLoadingTipos(false));
@@ -103,7 +103,7 @@ export function useDocumentosCliente(clienteId: string) {
     );
     setPendingFile(null);
     setLoadingTipos(true);
-    pesquisarDocumentosObrigatoriosDisponiveis(clienteId, doc.id)
+    pesquisarTiposDocumentosDisponiveis(clienteId, doc.id)
       .then(setTipos)
       .catch(console.error)
       .finally(() => setLoadingTipos(false));

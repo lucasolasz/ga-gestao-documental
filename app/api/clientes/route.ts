@@ -9,7 +9,7 @@ export async function GET() {
   const [clientsRes, docsRes] = await Promise.all([
     supabase
       .from("clients")
-      .select("*, categorias(id, descricao, categorias_documentos_obrigatorios(count))", { count: "exact" })
+      .select("*, categorias(id, descricao, categorias_tipos_documentos(count))", { count: "exact" })
       .order("nome"),
     supabase
       .from("documents")
@@ -41,7 +41,7 @@ export async function GET() {
     documentos_count: tiposPorCliente.get(c.id)?.size ?? 0,
     tipos_categoria_count:
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (c.categorias as any)?.categorias_documentos_obrigatorios?.[0]?.count ?? 0,
+      (c.categorias as any)?.categorias_tipos_documentos?.[0]?.count ?? 0,
   }));
 
   return NextResponse.json({ clientes, totalRecords: clientsRes.count ?? 0 });

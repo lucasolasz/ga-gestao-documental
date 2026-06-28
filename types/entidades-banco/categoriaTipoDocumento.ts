@@ -1,8 +1,8 @@
 import { Categoria } from './categoria';
-import { DocumentoObrigatorio } from './documentoObrigatorio';
+import { TipoDocumento } from './tipoDocumento';
 
 export interface CategoriaTipoDocumento {
     categoria: Categoria;
-    documento_obrigatorio: DocumentoObrigatorio;
+    tipo_documento: TipoDocumento;
     created_at?: string;
 }
