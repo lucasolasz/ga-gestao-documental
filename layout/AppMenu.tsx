@@ -33,6 +33,11 @@ const AppMenu = () => {
           icon: "pi pi-fw pi-file",
           to: "/documentosobrigatorios",
         },
+      ],
+    },
+    {
+      label: "POPs",
+      items: [
         {
           label: "Familias POP",
           icon: "pi pi-fw pi-tag",
