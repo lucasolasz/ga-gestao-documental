@@ -14,9 +14,9 @@ export async function PUT(
 
   const { data, error } = await supabase
     .from("tipos_documentos")
-    .update({ descricao: body.descricao })
+    .update({ descricao: body.descricao, familia_id: body.familia_id })
     .eq("id", id)
-    .select()
+    .select("*, familias_documentos(id, descricao)")
     .single();
 
   if (error) {
