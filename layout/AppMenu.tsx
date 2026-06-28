@@ -38,6 +38,11 @@ const AppMenu = () => {
           icon: "pi pi-fw pi-tag",
           to: "/familiapop",
         },
+        {
+          label: "Cadastro de POPs",
+          icon: "pi pi-fw pi-list",
+          to: "/pops",
+        },
       ],
     },
     {
