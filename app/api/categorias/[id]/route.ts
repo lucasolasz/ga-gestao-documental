@@ -7,7 +7,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body = (await request.json()) as { descricao: string };
+  const body = (await request.json()) as {
+    descricao: string;
+  };
 
   const supabase = await createClient();
 

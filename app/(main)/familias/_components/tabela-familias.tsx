@@ -10,26 +10,26 @@ import TabelaGenerica from "../../../../components/tabelaGenerica";
 import CrudDialog from "../../../../components/crudDialog";
 import ConfirmarExclusaoDialog from "../../../../components/confirmarExclusaoDialog";
 import { useCrud } from "../../../../hooks/useCrud";
+import { FamiliaDocumento } from "@/types/entidades-banco/familiaDocumento";
 import {
-  CategoriaForm,
-  pesquisarCategorias,
-  criarCategoria,
-  atualizarCategoria,
-  deletarCategoria as deletarCategoriaService,
-} from "@/services/categoria-service";
+  pesquisarFamilias,
+  criarFamilia,
+  atualizarFamilia,
+  deletarFamilia,
+} from "@/services/familia-service";
 
-interface TabelaCategoriasProps {
+interface TabelaFamiliasProps {
   titulo: string;
 }
 
-const categoriaVazia: CategoriaForm = {
+const familiaVazia: FamiliaDocumento = {
   id: "",
   descricao: "",
 };
 
-export default function TabelaCategorias({ titulo }: TabelaCategoriasProps) {
+export default function TabelaFamilias({ titulo }: TabelaFamiliasProps) {
   const {
-    items: categorias,
+    items: familias,
     control,
     handleSubmit,
     errors,
@@ -45,18 +45,18 @@ export default function TabelaCategorias({ titulo }: TabelaCategoriasProps) {
     colunaAcoes,
     salvar,
     deletar,
-  } = useCrud<CategoriaForm>(categoriaVazia, pesquisarCategorias);
+  } = useCrud<FamiliaDocumento>(familiaVazia, pesquisarFamilias);
 
   return (
     <>
       <Toast ref={toast} />
 
       <TabelaGenerica
-        value={categorias}
+        value={familias}
         titulo={titulo}
         headerActions={
           <Button
-            label="Nova"
+            label="Novo"
             icon="pi pi-plus"
             severity="success"
             onClick={abrirNovo}
@@ -75,15 +75,15 @@ export default function TabelaCategorias({ titulo }: TabelaCategoriasProps) {
 
       <CrudDialog
         visible={dialogAberto}
-        titulo="Detalhes da Categoria"
+        titulo="Detalhes da Família de Documento"
         onHide={fechar}
         onSalvar={handleSubmit((data) =>
           salvar(data, {
-            criarFn: criarCategoria,
-            atualizarFn: atualizarCategoria,
+            criarFn: criarFamilia,
+            atualizarFn: atualizarFamilia,
             mensagens: {
-              criado: "Categoria Criada",
-              atualizado: "Categoria Atualizada",
+              criado: "Família de Documento Criada",
+              atualizado: "Família de Documento Atualizada",
             },
           }),
         )}
@@ -119,14 +119,14 @@ export default function TabelaCategorias({ titulo }: TabelaCategoriasProps) {
         onHide={() => setDialogDeletar(false)}
         onConfirmar={() =>
           deletar({
-            deletarFn: deletarCategoriaService,
-            mensagem: "Categoria Excluída",
+            deletarFn: deletarFamilia,
+            mensagem: "Família de Documento Excluída",
           })
         }
         deletando={deletando}
         descricao={
           <span>
-            Tem certeza que deseja excluir a categoria{" "}
+            Tem certeza que deseja excluir a família de documento{" "}
             <b>{itemSelecionado.descricao}</b>?
           </span>
         }

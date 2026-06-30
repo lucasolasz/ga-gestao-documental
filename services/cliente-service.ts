@@ -2,6 +2,7 @@ import { Client } from "@/types/entidades-banco/client";
 
 export interface ClienteForm extends Client {
   categoria_id: string;
+  tiposDocumentosIds: string[];
 }
 
 export async function pesquisarClientes(): Promise<ClienteForm[]> {

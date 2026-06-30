@@ -8,7 +8,7 @@ export async function GET() {
 
   const { data, error, count } = await supabase
     .from("tipos_documentos")
-    .select("*", { count: "exact" })
+    .select("*, familias_documentos(id, descricao)", { count: "exact" })
     .order("descricao");
 
   if (error) {
@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from("tipos_documentos")
-    .insert({ descricao: body.descricao })
-    .select()
+    .insert({ descricao: body.descricao, familia_id: body.familia_id })
+    .select("*, familias_documentos(id, descricao)")
     .single();
 
   if (error) {

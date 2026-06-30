@@ -9,7 +9,7 @@ export async function GET() {
   const [clientsRes, docsRes] = await Promise.all([
     supabase
       .from("clients")
-      .select("*, categorias(id, descricao, categorias_tipos_documentos(count))", { count: "exact" })
+      .select("*, categorias(id, descricao), clientes_tipos_documentos(tipo_documento_id)", { count: "exact" })
       .order("nome"),
     supabase
       .from("documents")
@@ -39,20 +39,22 @@ export async function GET() {
     created_at: c.created_at,
     updated_at: c.updated_at,
     documentos_count: tiposPorCliente.get(c.id)?.size ?? 0,
-    tipos_categoria_count:
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (c.categorias as any)?.categorias_tipos_documentos?.[0]?.count ?? 0,
+    tipos_count: ((c.clientes_tipos_documentos as { tipo_documento_id: string }[]) ?? []).length,
+    tiposDocumentosIds: ((c.clientes_tipos_documentos as { tipo_documento_id: string }[]) ?? []).map(
+      (ctd) => ctd.tipo_documento_id,
+    ),
   }));
 
   return NextResponse.json({ clientes, totalRecords: clientsRes.count ?? 0 });
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json() as {
+  const body = (await request.json()) as {
     nome: string;
     cnpj: string;
     telefone?: string;
     categoria_id?: string;
+    tiposDocumentosIds?: string[];
   };
 
   const supabase = await createClient();
@@ -70,6 +72,21 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (body.tiposDocumentosIds?.length) {
+    const junctions = body.tiposDocumentosIds.map((tipoId) => ({
+      client_id: data.id,
+      tipo_documento_id: tipoId,
+    }));
+
+    const { error: junctionError } = await supabase
+      .from("clientes_tipos_documentos")
+      .insert(junctions);
+
+    if (junctionError) {
+      return NextResponse.json({ error: junctionError.message }, { status: 500 });
+    }
   }
 
   revalidatePath("/clientes");

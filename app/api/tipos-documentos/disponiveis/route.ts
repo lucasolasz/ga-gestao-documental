@@ -12,26 +12,16 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createClient();
 
-  const { data: cliente, error: clienteError } = await supabase
-    .from("clients")
-    .select("categoria_id")
-    .eq("id", client_id)
-    .single();
-
-  if (clienteError || !cliente?.categoria_id) {
-    return NextResponse.json({ tiposDocumentos: [] });
-  }
-
   const { data: juncoes, error: juncoesError } = await supabase
-    .from("categorias_tipos_documentos")
+    .from("clientes_tipos_documentos")
     .select("tipo_documento_id")
-    .eq("categoria_id", cliente.categoria_id);
+    .eq("client_id", client_id);
 
   if (juncoesError || !juncoes?.length) {
     return NextResponse.json({ tiposDocumentos: [] });
   }
 
-  const idsDaCategoria = juncoes.map((j) => j.tipo_documento_id as string);
+  const idsDoCliente = juncoes.map((j) => j.tipo_documento_id as string);
 
   let docsQuery = supabase
     .from("documents")
@@ -47,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   const tiposJaUsados = new Set((docsUsados ?? []).map((d) => d.tipo as string));
 
-  const idsDisponiveis = idsDaCategoria.filter((id) => !tiposJaUsados.has(id));
+  const idsDisponiveis = idsDoCliente.filter((id) => !tiposJaUsados.has(id));
 
   if (!idsDisponiveis.length) {
     return NextResponse.json({ tiposDocumentos: [] });

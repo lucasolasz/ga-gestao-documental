@@ -8,11 +8,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body = await request.json() as {
+  const body = (await request.json()) as {
     nome: string;
     cnpj: string;
     telefone?: string;
     categoria_id?: string;
+    tiposDocumentosIds?: string[];
   };
 
   const supabase = await createClient();
@@ -31,6 +32,30 @@ export async function PUT(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const { error: deleteError } = await supabase
+    .from("clientes_tipos_documentos")
+    .delete()
+    .eq("client_id", id);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+  }
+
+  if (body.tiposDocumentosIds?.length) {
+    const junctions = body.tiposDocumentosIds.map((tipoId) => ({
+      client_id: id,
+      tipo_documento_id: tipoId,
+    }));
+
+    const { error: insertError } = await supabase
+      .from("clientes_tipos_documentos")
+      .insert(junctions);
+
+    if (insertError) {
+      return NextResponse.json({ error: insertError.message }, { status: 500 });
+    }
   }
 
   revalidatePath("/clientes");

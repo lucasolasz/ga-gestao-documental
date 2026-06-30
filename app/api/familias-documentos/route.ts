@@ -1,37 +1,30 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { FamiliaDocumento } from "@/types/entidades-banco/familiaDocumento";
 
 export async function GET() {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("categorias")
-    .select("id, descricao, created_at")
+  const { data, error, count } = await supabase
+    .from("familias_documentos")
+    .select("*", { count: "exact" })
     .order("descricao");
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const categorias = (data ?? []).map((cat) => ({
-    id: cat.id,
-    descricao: cat.descricao,
-    created_at: cat.created_at,
-  }));
-
-  return NextResponse.json({ categorias, totalRecords: categorias.length });
+  return NextResponse.json({ familias: data, totalRecords: count ?? 0 });
 }
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json()) as {
-    descricao: string;
-  };
+  const body = (await request.json()) as Partial<FamiliaDocumento>;
 
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("categorias")
+    .from("familias_documentos")
     .insert({ descricao: body.descricao })
     .select()
     .single();
@@ -40,7 +33,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  revalidatePath("/categorias");
+  revalidatePath("/familias");
 
   return NextResponse.json(data, { status: 201 });
 }

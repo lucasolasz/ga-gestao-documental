@@ -1,29 +1,29 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { TipoDocumento } from "@/types/entidades-banco/tipoDocumento";
+import { FamiliaDocumento } from "@/types/entidades-banco/familiaDocumento";
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body = (await request.json()) as Partial<TipoDocumento>;
+  const body = (await request.json()) as Partial<FamiliaDocumento>;
 
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("tipos_documentos")
-    .update({ descricao: body.descricao, familia_id: body.familia_id })
+    .from("familias_documentos")
+    .update({ descricao: body.descricao })
     .eq("id", id)
-    .select("*, familias_documentos(id, descricao)")
+    .select()
     .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  revalidatePath("/tipodocumento");
+  revalidatePath("/familias");
 
   return NextResponse.json(data);
 }
@@ -37,7 +37,7 @@ export async function DELETE(
   const supabase = await createClient();
 
   const { error } = await supabase
-    .from("tipos_documentos")
+    .from("familias_documentos")
     .delete()
     .eq("id", id);
 
@@ -45,7 +45,7 @@ export async function DELETE(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  revalidatePath("/tipodocumento");
+  revalidatePath("/familias");
 
   return NextResponse.json({ success: true });
 }

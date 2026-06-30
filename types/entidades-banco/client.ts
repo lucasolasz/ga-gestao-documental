@@ -10,5 +10,5 @@ export interface Client {
     created_at?: string;
     updated_at?: string;
     documentos_count?: number;
-    tipos_categoria_count?: number;
+    tipos_count?: number;
 }

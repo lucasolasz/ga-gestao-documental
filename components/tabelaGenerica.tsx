@@ -9,11 +9,16 @@ import {
   useRef,
   CSSProperties,
 } from "react";
+import PrimeReact, { addLocale } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
+import ptBR from "primelocale/pt-BR.json";
+
+addLocale("pt-BR", ptBR["pt-BR"]);
+PrimeReact.locale = "pt-BR";
 
 export interface ColumnDef<T> {
   field?: string;

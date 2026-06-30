@@ -14,11 +14,23 @@ $$ language plpgsql;
 
 -- ------------------------------------------------------------
 
+create table public.familias_documentos (
+  id uuid not null default gen_random_uuid(),
+  descricao text not null,
+  created_at timestamp with time zone null default now(),
+  constraint familias_pop_pkey primary key (id)
+) tablespace pg_default;
+
+-- ------------------------------------------------------------
+
 create table public.tipos_documentos (
   id          uuid not null default gen_random_uuid(),
   descricao   text not null,
+  familia_id  uuid null,
   created_at  timestamp with time zone not null default timezone('utc'::text, now()),
-  constraint tipos_documentos_pkey primary key (id)
+  constraint tipos_documentos_pkey primary key (id),
+  constraint tipos_documentos_familia_id_fkey
+    foreign key (familia_id) references public.familias_documentos (id) on delete set null
 ) tablespace pg_default;
 
 -- ------------------------------------------------------------
@@ -28,20 +40,6 @@ create table public.categorias (
   descricao   text not null,
   created_at  timestamp with time zone not null default timezone('utc'::text, now()),
   constraint categorias_pkey primary key (id)
-) tablespace pg_default;
-
--- ------------------------------------------------------------
-
-create table public.categorias_tipos_documentos (
-  categoria_id      uuid not null,
-  tipo_documento_id uuid not null,
-  created_at        timestamp with time zone not null default timezone('utc'::text, now()),
-  constraint categorias_tipos_documentos_pkey
-    primary key (categoria_id, tipo_documento_id),
-  constraint categorias_tipos_documentos_categoria_id_fkey
-    foreign key (categoria_id) references categorias (id) on delete cascade,
-  constraint categorias_tipos_documentos_tipo_documento_id_fkey
-    foreign key (tipo_documento_id) references tipos_documentos (id) on delete cascade
 ) tablespace pg_default;
 
 -- ------------------------------------------------------------
@@ -58,12 +56,44 @@ create table public.clients (
   constraint clients_pkey primary key (id),
   constraint clients_cnpj_key unique (cnpj),
   constraint clients_categoria_id_fkey
-    foreign key (categoria_id) references categorias (id) on delete restrict
+    foreign key (categoria_id) references categorias (id)
 ) tablespace pg_default;
 
 create trigger clients_updated_at
   before update on clients
   for each row execute function update_updated_at();
+
+-- ------------------------------------------------------------
+
+create table public.clientes_tipos_documentos (
+  client_id      uuid not null,
+  tipo_documento_id uuid not null,
+  created_at        timestamp with time zone not null default timezone('utc'::text, now()),
+  constraint clientes_tipos_documentos_pkey
+    primary key (client_id, tipo_documento_id),
+  constraint clientes_tipos_documentos_client_id_fkey
+    foreign key (client_id) references clients (id) on delete cascade,
+  constraint clientes_tipos_documentos_tipo_documento_id_fkey
+    foreign key (tipo_documento_id) references tipos_documentos (id) on delete cascade
+) tablespace pg_default;
+
+alter table public.clientes_tipos_documentos enable row level security;
+
+create policy "Usuários autenticados podem visualizar"
+  on public.clientes_tipos_documentos as permissive
+  for select to authenticated using (true);
+
+create policy "Usuários autenticados podem inserir"
+  on public.clientes_tipos_documentos as permissive
+  for insert to authenticated with check (true);
+
+create policy "Usuários autenticados podem atualizar"
+  on public.clientes_tipos_documentos as permissive
+  for update to authenticated using (true) with check (true);
+
+create policy "Usuários autenticados podem excluir"
+  on public.clientes_tipos_documentos as permissive
+  for delete to authenticated using (true);
 
 -- ------------------------------------------------------------
 
