@@ -25,10 +25,27 @@ export default function PainelCoberturaDocumental({
 
   function generatePlainText() {
     const hoje = new Date().toLocaleDateString("pt-BR");
-    const present =
-      tiposPreenchidos.map((t) => `- ${t.descricao}`).join("\n") || "- Nenhum";
-    const missing =
-      tiposDisponiveis.map((t) => `- ${t.descricao}`).join("\n") || "- Nenhum";
+    const isPop = (descricao: string) => descricao.toLowerCase().startsWith("pop");
+    const POP_LABEL = "POP (Procedimento Operacional Padrão)";
+
+    const presentDescricoes = tiposPreenchidos
+      .filter((t) => !isPop(t.descricao))
+      .map((t) => t.descricao);
+    const missingDescricoes = tiposDisponiveis
+      .filter((t) => !isPop(t.descricao))
+      .map((t) => t.descricao);
+
+    const temPopPreenchido = tiposPreenchidos.some((t) => isPop(t.descricao));
+    const temPopFaltando = tiposDisponiveis.some((t) => isPop(t.descricao));
+
+    if (temPopPreenchido) {
+      presentDescricoes.push(POP_LABEL);
+    } else if (temPopFaltando) {
+      missingDescricoes.push(POP_LABEL);
+    }
+
+    const present = presentDescricoes.map((d) => `- ${d}`).join("\n") || "- Nenhum";
+    const missing = missingDescricoes.map((d) => `- ${d}`).join("\n") || "- Nenhum";
     return `Assunto: Documentos necessários — ${hoje}\n\nPreenchidos:\n${present}\n\nFaltando:\n${missing}`;
   }
 
